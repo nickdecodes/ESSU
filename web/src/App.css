@@ -1,0 +1,50 @@
+/*  
+  Ant Design 已自带绝大部分样式，这里只需少量自定义覆盖即可  
+*/
+
+/* 全局基础字体及去除默认外边距 */
+body {
+  margin: 0;  /* 去除页面默认外边距 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;  
+  /* 设定中英文主流操作系统与常用字体，保证跨平台美观 */
+}
+
+/* 针对移动端显示的小屏优化 */
+@media (max-width: 768px) {
+  /* Header适配：两侧内边距缩小，空间更紧凑 */
+  .ant-layout-header {
+    padding: 0 12px !important;
+  }
+
+  /* 内容区内边距缩小，提升有效展示空间 */
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+
+  /* 卡片间距减少，适合小屏滚动展示 */
+  .ant-card {
+    margin-bottom: 12px;
+  }
+
+  /* 表头单元格：内边距和字体缩小，增强紧凑性 */
+  .ant-table-thead > tr > th {
+    padding: 8px 4px !important;
+    font-size: 12px;
+  }
+
+  /* 表体单元格：内边距缩小，表格更紧凑 */
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+  }
+
+  /* 表单项下边距减少，排布更密集 */
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  /* 输入框字体放大，防止 iOS 自动放大输入内容 */
+  .ant-input, .ant-input-number {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+}

@@ -1,0 +1,762 @@
+2025-10-29 01:45:13,077 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 01:45:13,077 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 01:45:13,093 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 01:45:13,093 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 01:45:13,094 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 01:45:13] "GET /users HTTP/1.1" 200 -
+2025-10-29 02:15:12,993 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 02:15:12,993 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 02:15:12,998 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 02:15:12,998 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 02:15:13,000 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 02:15:12] "GET /users HTTP/1.1" 200 -
+2025-10-29 07:23:11,375 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 07:23:11,375 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 07:23:11,382 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 07:23:11,382 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 07:23:11,383 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 07:23:11] "GET /users HTTP/1.1" 200 -
+2025-10-29 09:21:43,242 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 09:21:43,242 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 09:21:43,244 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 09:21:43,244 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 09:21:43,254 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:21:43,254 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:21:43,260 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 09:21:43,260 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 09:21:43,261 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 09:21:43,261 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:21:43,261 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:21:43,263 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /users HTTP/1.1" 200 -
+2025-10-29 09:21:43,264 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 09:21:43,264 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 09:21:43,263 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 09:21:43,263 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 09:21:43,266 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 09:21:43,268 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:21:43,268 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:21:43,268 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 09:21:43,268 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 09:21:43,269 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 09:21:43,269 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 09:21:43,269 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 09:21:43,271 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:21:43,271 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 09:21:43,271 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 09:21:43,271 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:21:43,271 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 09:21:43,271 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:21:43] "GET /users HTTP/1.1" 200 -
+2025-10-29 09:51:43,987 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:51:43,987 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 09:51:44,000 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:51:44,000 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 09:51:44,001 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 09:51:44] "GET /users HTTP/1.1" 200 -
+2025-10-29 10:21:43,973 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 10:21:43,973 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 10:21:43,983 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 10:21:43,983 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 10:21:43,984 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 10:21:43] "GET /users HTTP/1.1" 200 -
+2025-10-29 10:51:43,967 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 10:51:43,967 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 10:51:43,974 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 10:51:43,974 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 10:51:43,976 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 10:51:43] "GET /users HTTP/1.1" 200 -
+2025-10-29 11:21:43,897 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:21:43,897 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:21:43,905 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:21:43,905 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:21:43,906 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:21:43] "GET /users HTTP/1.1" 200 -
+2025-10-29 11:34:56,445 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 11:34:56,445 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 11:34:56,446 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 11:34:56,446 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 11:34:56,450 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:34:56,450 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:34:56,454 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:34:56,454 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:34:56,456 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /users HTTP/1.1" 200 -
+2025-10-29 11:34:56,457 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 11:34:56,457 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 11:34:56,459 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 11:34:56,460 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:34:56,460 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 11:34:56,461 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 11:34:56,461 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 11:34:56,462 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:34:56,462 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 11:34:56,463 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 11:34:56,463 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 11:34:56,463 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /users HTTP/1.1" 200 -
+2025-10-29 11:34:56,462 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 11:34:56,462 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 11:34:56,463 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 11:34:56,463 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 11:34:56,464 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 11:34:56,464 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 11:34:56,465 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 11:34:56,465 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 11:34:56,465 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 11:34:56] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:05:08,002 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:08,002 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:08,011 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:08,011 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:08,012 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:08] "GET /users HTTP/1.1" 200 -
+2025-10-29 12:05:42,281 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:05:42,281 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:05:42,282 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:05:42,282 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:05:42,287 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:42,287 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:42,294 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:05:42,294 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:05:42,295 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:05:42,296 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:42,297 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:05:42,297 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:05:42,296 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:42,298 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /users HTTP/1.1" 200 -
+2025-10-29 12:05:42,299 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:05:42,299 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:05:42,300 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:05:42,301 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:05:42,301 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:05:42,301 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:42,301 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:05:42,302 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:05:42,303 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:05:42,303 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:05:42,305 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:42,305 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:05:42,305 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /users HTTP/1.1" 200 -
+2025-10-29 12:05:42,306 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:05:42,306 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:05:42,307 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:05:42] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:36:20,231 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:36:20,231 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:36:20,232 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:36:20,232 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:36:20,241 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:36:20,241 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:36:20,252 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:36:20,252 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:36:20,253 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:36:20,253 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:36:20,253 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:36:20,254 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /users HTTP/1.1" 200 -
+2025-10-29 12:36:20,254 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:36:20,254 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:36:20,254 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:36:20,255 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:36:20,255 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 12:36:20,256 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:36:20,256 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 12:36:20,256 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:36:20,256 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 12:36:20,257 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:36:20,257 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 12:36:20,257 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 12:36:20,258 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:36:20,258 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 12:36:20,258 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /users HTTP/1.1" 200 -
+2025-10-29 12:36:20,259 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:36:20,259 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 12:36:20,259 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 12:36:20] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 14:06:53,563 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:06:53,563 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:06:53,580 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:06:53,580 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:06:53,580 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:06:53] "GET /users HTTP/1.1" 200 -
+2025-10-29 14:12:21,124 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 14:12:21,124 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 14:12:21,125 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 14:12:21,125 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 14:12:21,129 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:12:21,129 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:12:21,141 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 14:12:21,141 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 14:12:21,142 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 14:12:21,143 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:12:21,143 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:12:21,143 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /users HTTP/1.1" 200 -
+2025-10-29 14:12:21,144 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 14:12:21,144 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 14:12:21,145 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:12:21,145 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:12:21,146 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 14:12:21,146 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 14:12:21,146 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 14:12:21,146 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 14:12:21,147 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:12:21,147 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:12:21,147 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 14:12:21,146 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 14:12:21,147 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /users HTTP/1.1" 200 -
+2025-10-29 14:12:21,149 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 14:12:21,149 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 14:12:21,150 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 14:12:21,150 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 14:12:21,150 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:12:21] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 14:42:32,081 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:42:32,081 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 14:42:32,091 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:42:32,091 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 14:42:32,092 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 14:42:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 15:12:32,113 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 15:12:32,113 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 15:12:32,121 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 15:12:32,121 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 15:12:32,122 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 15:12:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 15:42:32,108 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 15:42:32,108 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 15:42:32,114 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 15:42:32,114 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 15:42:32,115 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 15:42:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 16:12:32,027 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 16:12:32,027 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 16:12:32,031 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 16:12:32,031 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 16:12:32,031 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 16:12:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 16:42:32,023 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 16:42:32,023 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 16:42:32,029 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 16:42:32,029 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 16:42:32,030 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 16:42:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 17:12:32,088 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 17:12:32,088 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 17:12:32,098 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 17:12:32,098 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 17:12:32,099 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 17:12:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 17:42:37,127 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 17:42:37,127 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 17:42:37,131 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 17:42:37,131 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 17:42:37,131 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 17:42:37] "GET /users HTTP/1.1" 200 -
+2025-10-29 18:12:37,015 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:12:37,015 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:12:37,025 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:12:37,025 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:12:37,025 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:12:37] "GET /users HTTP/1.1" 200 -
+2025-10-29 18:33:20,716 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 18:33:20,716 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 18:33:20,720 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 18:33:20,720 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 18:33:20,722 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:33:20,722 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:33:20,725 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 18:33:20,725 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 18:33:20,727 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:33:20,727 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:33:20,728 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 18:33:20,729 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 18:33:20,729 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 18:33:20,730 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 18:33:20,729 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /users HTTP/1.1" 200 -
+2025-10-29 18:33:20,733 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 18:33:20,733 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 18:33:20,734 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 18:33:20,734 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 18:33:20,735 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:33:20,735 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 18:33:20,736 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 18:33:20,736 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 18:33:20,736 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 18:33:20,736 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:33:20,736 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 18:33:20,737 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /users HTTP/1.1" 200 -
+2025-10-29 18:33:20,738 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 18:33:20,738 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 18:33:20,739 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 18:33:20] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 20:41:32,458 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 20:41:32,458 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 20:41:32,493 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 20:41:32,493 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 20:41:32,494 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 20:41:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 21:11:32,425 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 21:11:32,425 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 21:11:32,430 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 21:11:32,430 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 21:11:32,431 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 21:11:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 21:41:32,427 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 21:41:32,427 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 21:41:32,432 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 21:41:32,432 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 21:41:32,434 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 21:41:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:11:32,460 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:11:32,460 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:11:32,470 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:11:32,470 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:11:32,471 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:11:32] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:29:35,786 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:29:35,786 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:29:35,789 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:29:35,789 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:29:35,790 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:29:35,790 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:29:35,793 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:29:35,793 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:29:35,795 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:29:35,794 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:29:35,794 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:29:35,796 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:29:35,797 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:29:35,797 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:29:35,797 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:29:35,796 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:29:35,799 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:29:35,800 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:29:35,800 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:29:35,801 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:29:35,801 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:29:35,802 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:29:35,802 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:29:35,802 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:29:35,805 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:29:35,805 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:29:35,805 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:29:35,806 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:29:35,806 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:29:35,807 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:29:35] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:48:17,161 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:48:17,161 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:48:17,162 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:48:17,162 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:48:17,166 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:48:17,166 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:48:17,173 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:48:17,173 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:48:17,173 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:48:17,175 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:48:17,175 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:48:17,175 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:48:17,176 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:48:17,176 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:48:17,176 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:48:17,176 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:48:17,177 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:48:17,177 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:48:17,177 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:48:17,178 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:48:17,178 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:48:17,178 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:48:17,179 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:48:17,179 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:48:17,179 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:48:17,180 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:48:17,180 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:48:17,181 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:48:17,181 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:48:17,181 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:48:17] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:56:35,901 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:56:35,901 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:56:35,902 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:56:35,902 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:56:35,906 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:56:35,906 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:56:35,912 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:56:35,912 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:56:35,914 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:56:35,914 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:56:35,915 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:56:35,917 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:56:35,916 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:56:35,915 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:56:35,918 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:56:35,920 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:56:35,920 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 22:56:35,920 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:56:35,920 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 22:56:35,921 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:56:35,921 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 22:56:35,923 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:56:35,923 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 22:56:35,923 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:56:35,923 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 22:56:35,923 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:56:35,923 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /users HTTP/1.1" 200 -
+2025-10-29 22:56:35,924 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:56:35,924 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 22:56:35,924 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:56:35] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 22:59:51,230 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 22:59:51,230 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 22:59:51,232 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 22:59:51,232 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 22:59:51,233 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 22:59:51,233 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 22:59:51,234 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 22:59:51] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:01:49,169 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:49,169 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:49,183 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:49,183 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:49,184 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:49] "GET /records?page=1&page_size=20&sort_order=desc&start_date=2025-10-27&end_date=2025-11-02 HTTP/1.1" 200 -
+2025-10-29 23:01:49,186 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:49,186 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:49,190 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:49,190 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:49,191 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:49] "GET /records?page=1&page_size=20&sort_order=desc&start_date=2025-10-27&end_date=2025-11-02 HTTP/1.1" 200 -
+2025-10-29 23:01:59,398 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:01:59,398 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:01:59,398 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:01:59,398 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:01:59,400 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:59,400 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:59,411 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:01:59,411 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:01:59,412 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:01:59,414 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:01:59,414 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:01:59,417 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:01:59,418 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:01:59,418 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:01:59,420 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:01:59,420 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:01:59,423 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:59,423 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:59,424 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /records?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:01:59,425 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:01:59,425 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:01:59,427 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:01:59,429 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:59,429 - main - INFO - API请求: GET /records - IP: 127.0.0.1
+2025-10-29 23:01:59,430 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:01:59,430 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:01:59,431 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:01:59,435 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:59,435 - main - INFO - API响应: GET /records - 状态码: 200
+2025-10-29 23:01:59,435 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:01:59] "GET /records?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:02:01,873 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:01,873 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:01,873 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:01,873 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:01,873 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:01,873 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:01,873 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:02:01] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:02:01,945 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:01,945 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:01,946 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:01,946 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:01,946 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:01,946 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:01,946 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:02:01] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:02:03,896 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:03,896 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:02:03,897 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:03,897 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:02:03,897 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:03,897 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:02:03,898 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:02:03] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:03:59,641 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:03:59,641 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:03:59,643 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:03:59,643 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:03:59,643 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:03:59,643 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:03:59,644 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:03:59] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:04:20,250 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:04:20,250 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:04:20,250 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:04:20,250 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:04:20,251 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:04:20,251 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:04:20,251 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:04:20] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:05:55,092 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:05:55,092 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:05:55,094 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:05:55,094 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:05:55,096 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:05:55,096 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:05:55,096 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:05:55] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:06:24,573 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:06:24,573 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:06:24,574 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:06:24,574 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:06:24,575 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:06:24,575 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:06:24,575 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:06:24] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:08:01,531 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:08:01,531 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:08:01,535 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:08:01,535 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:08:01,537 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:08:01,537 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:08:01,540 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:08:01,540 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:08:01,541 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:08:01,541 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:08:01,541 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:08:01,542 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /users HTTP/1.1" 200 -
+2025-10-29 23:08:01,543 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:08:01,543 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:08:01,545 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:08:01,545 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:08:01,545 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:08:01,545 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:08:01,545 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:08:01,548 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:08:01,548 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:08:01,549 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:08:01,549 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:08:01,550 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:08:01,550 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /users HTTP/1.1" 200 -
+2025-10-29 23:08:01,550 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:08:01,550 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:08:01,550 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:08:01,550 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:08:01,551 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:08:01,764 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:01,764 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:01,764 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:01,764 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:01,765 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:01,765 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:01,765 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:01] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:08:32,461 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:08:32,461 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:08:32,462 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:08:32,462 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:08:32,462 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:08:32,462 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:08:32,462 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:32] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:08:32,556 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:08:32,556 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:08:32,556 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:08:32,556 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:08:32,556 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:08:32,556 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:08:32,557 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:32] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:08:40,432 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:40,432 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:40,432 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:40,432 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:40,433 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:40,433 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:40,433 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:40] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:08:40,481 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:40,481 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:08:40,481 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:40,481 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:08:40,482 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:40,482 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:08:40,482 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:08:40] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:09:48,160 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:09:48,160 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:09:48,162 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:09:48,162 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:09:48,162 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:09:48,162 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:09:48,162 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:09:48] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:10:50,688 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:10:50,688 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:10:50,688 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:10:50,688 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:10:50,689 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:10:50,689 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:10:50,689 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:10:50] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:11:44,106 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:11:44,106 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:11:44,107 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:11:44,107 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:11:44,108 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:11:44,108 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:11:44,108 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:11:44] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:11:44,169 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:11:44,169 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:11:44,169 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:11:44,169 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:11:44,170 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:11:44,170 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:11:44,170 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:11:44] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:14:34,082 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:14:34,082 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:14:34,085 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:14:34,085 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:14:34,086 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:14:34,086 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:14:34,086 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:14:34] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:14:48,637 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:14:48,637 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:14:48,638 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:14:48,638 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:14:48,638 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:14:48,638 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:14:48,638 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:14:48] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:19:16,247 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:16,247 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:16,247 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:16,247 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:16,248 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:16,248 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:16,248 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:19:16] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:19:21,412 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:21,412 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:21,412 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:21,412 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:21,412 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:21,412 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:21,412 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:19:21] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:19:39,176 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:39,176 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:19:39,177 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:39,177 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:19:39,177 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:39,177 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:19:39,177 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:19:39] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:20:51,131 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:20:51,131 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:20:51,131 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:20:51,131 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:20:51,131 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:20:51,131 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:20:51,132 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:20:51] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:22:15,198 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:22:15,198 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:22:15,200 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:22:15,200 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:22:15,201 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:22:15,201 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:22:15,201 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:22:15] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:22:49,995 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:22:49,995 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:22:49,996 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:22:49,996 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:22:49,997 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:22:49,997 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:22:49,997 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:22:49] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:23:58,519 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:23:58,519 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:23:58,521 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:23:58,521 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:23:58,521 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:23:58,521 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:23:58,521 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:23:58] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:24:08,178 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:24:08,178 - main - INFO - API请求: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - IP: 127.0.0.1
+2025-10-29 23:24:08,180 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:24:08,180 - main - WARNING - 404错误: http://localhost:5274/images/cdf315c04b904ba08d238533c43bdd4a.jpg
+2025-10-29 23:24:08,180 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:24:08,180 - main - INFO - API响应: GET /images/cdf315c04b904ba08d238533c43bdd4a.jpg - 状态码: 404
+2025-10-29 23:24:08,180 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:08] "[33mGET /images/cdf315c04b904ba08d238533c43bdd4a.jpg HTTP/1.1[0m" 404 -
+2025-10-29 23:24:11,355 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:11,355 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:11,355 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:11,355 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:11,356 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:11,356 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:11,356 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:11] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:11,450 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:11,450 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:11,450 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:11,450 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:11,451 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:11,451 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:11,451 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:11] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:29,603 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:29,603 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:29,604 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:29,604 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:29,604 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:29,604 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:29,604 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:29] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:30,949 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:30,949 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:30,949 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:30,949 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:30,949 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:30,949 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:30,949 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:30] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:35,120 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:35,120 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:35,120 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:35,120 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:35,121 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:35,121 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:35,121 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:35] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:35,676 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:35,676 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:35,678 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:35,678 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:35,679 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:35,679 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:35,680 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:35] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:36,154 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:36,154 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:36,154 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:36,154 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:36,155 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:36,155 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:36,155 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:36] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:36,610 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:36,610 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:36,611 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:36,611 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:36,611 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:36,611 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:36,611 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:36] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:37,065 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,065 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,065 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,065 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,066 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,066 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,066 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:37] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:37,542 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,542 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,542 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,542 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,543 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,543 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,543 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:37] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:37,983 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,983 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:37,984 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,984 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:37,984 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,984 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:37,984 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:37] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:38,427 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:38,427 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:38,428 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:38,428 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:38,428 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:38,428 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:38,429 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:38] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:39,077 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:39,077 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:39,078 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:39,078 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:39,078 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:39,078 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:39,078 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:39] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
+2025-10-29 23:24:47,617 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:24:47,617 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:24:47,617 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:24:47,617 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:24:47,619 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:24:47,619 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:24:47,621 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:24:47,621 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:24:47,622 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:24:47,622 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:24:47,623 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:24:47,623 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:24:47,623 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:24:47,622 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:24:47,623 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /users HTTP/1.1" 200 -
+2025-10-29 23:24:47,631 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:24:47,631 - main - INFO - API请求: GET /materials - IP: 127.0.0.1
+2025-10-29 23:24:47,632 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:24:47,632 - main - INFO - API请求: GET /products - IP: 127.0.0.1
+2025-10-29 23:24:47,633 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:24:47,633 - main - INFO - API请求: GET /users - IP: 127.0.0.1
+2025-10-29 23:24:47,634 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:24:47,634 - main - INFO - API响应: GET /materials - 状态码: 200
+2025-10-29 23:24:47,635 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /materials?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:24:47,635 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:24:47,635 - main - INFO - API响应: GET /products - 状态码: 200
+2025-10-29 23:24:47,635 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:24:47,635 - main - INFO - API响应: GET /users - 状态码: 200
+2025-10-29 23:24:47,635 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /products?page_size=1000 HTTP/1.1" 200 -
+2025-10-29 23:24:47,636 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "GET /users HTTP/1.1" 200 -
+2025-10-29 23:24:47,987 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:47,987 - main - INFO - API请求: GET /images/802832d4c6a049d49f1904dea70cee73.png - IP: 127.0.0.1
+2025-10-29 23:24:47,988 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:47,988 - main - WARNING - 404错误: http://localhost:5274/images/802832d4c6a049d49f1904dea70cee73.png
+2025-10-29 23:24:47,988 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:47,988 - main - INFO - API响应: GET /images/802832d4c6a049d49f1904dea70cee73.png - 状态码: 404
+2025-10-29 23:24:47,988 - werkzeug - INFO - 127.0.0.1 - - [29/Oct/2025 23:24:47] "[33mGET /images/802832d4c6a049d49f1904dea70cee73.png HTTP/1.1[0m" 404 -
