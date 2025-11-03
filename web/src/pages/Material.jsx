@@ -330,7 +330,7 @@ const Material = ({ user }) => {
 
   const renderMobileCards = () => (
     <>
-      <div  style={{ marginTop: '16px', height: 'calc(100vh - 360px)', overflow: 'auto' }}>
+      <div  style={{ marginTop: '16px', height: 'calc(100vh - 320px)', overflow: 'auto' }}>
         {getFilteredMaterials().map((material) => {
           const isSelected = selectedRowKeys.includes(material.id);
           return (
@@ -452,7 +452,7 @@ const Material = ({ user }) => {
       <Table 
         virtual
         sticky
-        scroll={{ x: 1000, y: window.innerHeight - 360 }}
+        scroll={{ x: 1000, y: window.innerHeight - 320 }}
         columns={getColumns()}
         dataSource={getFilteredMaterials()} 
         rowKey="id"

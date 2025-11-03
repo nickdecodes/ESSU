@@ -424,7 +424,7 @@ const Product = ({ user }) => {
 
   const renderMobileCards = () => (
     <>
-      <div  style={{ marginTop: '16px', height: 'calc(100vh - 360px)', overflow: 'auto' }}>
+      <div  style={{ marginTop: '16px', height: 'calc(100vh - 320px)', overflow: 'auto' }}>
         {filteredProducts.map((product) => {
           const isSelected = selectedRowKeys.includes(product.id);
           return (
@@ -626,7 +626,7 @@ const Product = ({ user }) => {
       <Table 
         virtual
         sticky
-        scroll={{ x: 1200, y: window.innerHeight - 360 }}
+        scroll={{ x: 1200, y: window.innerHeight - 320 }}
         columns={getColumns()}
         dataSource={filteredProducts} 
         rowKey="id" 

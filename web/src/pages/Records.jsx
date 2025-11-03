@@ -237,7 +237,7 @@ const Records = () => {
         rowKey={(record) => `${record.operation_type}-${record.id}`}
         loading={loading}
         pagination={false}
-        scroll={{ y: window.innerHeight - 420 }}
+        scroll={{ y: window.innerHeight - 320 }}
         size="middle"
       />
     </div>
