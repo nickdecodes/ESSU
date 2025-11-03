@@ -334,7 +334,7 @@ const Product = ({ user }) => {
         if (result.data.success) imagePath = result.data.image_path;
       }
       
-      const response = await api.addProduct({ name: values.name, materials, image_path: imagePath, username: user.username });
+      const response = await api.addProduct({ name: values.name, materials, manual_price: values.manual_price || 0, image_path: imagePath, username: user.username });
       
       if (response.data.success) {
         message.success('产品添加成功');

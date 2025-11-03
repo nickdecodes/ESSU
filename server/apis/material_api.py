@@ -1,15 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-@Author  : nickdecodes
-@Email   : 
-@Usage   : 
-@Filename: material_api.py
-@DateTime: 2025/10/25 23:17
-@Software: vscode
-"""
-
 from flask import Blueprint, request, jsonify
 from services.material_service import MaterialService
 from config import Config
@@ -25,24 +16,19 @@ def allowed_file(filename):
 
 @material_bp.route('/materials', methods=['POST'])
 def add_material():
-    # 检查是否是文件上传
     if 'image' in request.files:
-        # 处理带图片的表单数据
         name = request.form.get('name', '').strip()
         in_price = float(request.form.get('in_price', 0))
         out_price = float(request.form.get('out_price', in_price))
         username = request.form.get('username', '')
         
-        # 验证数据
         if not name or len(name) > Config.MAX_NAME_LENGTH:
             return jsonify({'success': False, 'message': f'材料名称不能为空且不能超过{Config.MAX_NAME_LENGTH}个字符'})
         
-        # 处理图片上传
         file = request.files['image']
         image_path = None
         if file and file.filename and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            # 生成唯一文件名
             if '.' in filename:
                 file_ext = filename.rsplit('.', 1)[1].lower()
             else:
@@ -54,7 +40,6 @@ def add_material():
         
         result = material_service.add_material(name, in_price, out_price, username, image_path)
     else:
-        # 处理JSON数据
         data = request.json
         name = data.get('name', '').strip()
         if not name or len(name) > Config.MAX_NAME_LENGTH:
@@ -69,14 +54,13 @@ def add_material():
     if result['success']:
         return jsonify({'success': True, 'material_id': result['material_id']})
     else:
-        return jsonify({'success': False, 'message': '材料添加失败'})
+        return jsonify(result)
 
 @material_bp.route('/materials')
 def get_materials():
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', Config.DEFAULT_PAGE_SIZE, type=int)
     
-    # 限制页面大小
     page_size = min(page_size, Config.MAX_PAGE_SIZE)
     offset = (page - 1) * page_size
     
@@ -112,11 +96,8 @@ def update_material(material_id):
     if not name or len(name) > Config.MAX_NAME_LENGTH:
         return jsonify({'success': False, 'message': f'材料名称不能为空且不能超过{Config.MAX_NAME_LENGTH}个字符'})
     
-    success = material_service.update_material(material_id, name, in_price, out_price, username, image_path)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': '材料不存在或更新失败'})
+    result = material_service.update_material(material_id, name, in_price, out_price, username, image_path)
+    return jsonify(result)
 
 @material_bp.route('/materials/<int:material_id>', methods=['DELETE'])
 def delete_material(material_id):
@@ -147,11 +128,8 @@ def material_in():
     if supplier and len(supplier) > Config.MAX_SUPPLIER_LENGTH:
         return jsonify({'success': False, 'message': f'供应商名称不能超过{Config.MAX_SUPPLIER_LENGTH}个字符'})
     
-    success = material_service.inbound(int(material_id), quantity, supplier, username)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': '材料不存在'})
+    result = material_service.inbound(int(material_id), quantity, supplier, username)
+    return jsonify(result)
 
 @material_bp.route('/materials/out', methods=['POST'])
 def material_out():
@@ -162,10 +140,7 @@ def material_out():
     username = data.get('username', '')
     
     result = material_service.outbound(int(material_id), quantity, customer, username)
-    if result['success']:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': result['message']})
+    return jsonify(result)
 
 @material_bp.route('/materials/<int:material_id>/stock')
 def get_material_stock(material_id):
@@ -187,7 +162,6 @@ def import_materials():
 
 @material_bp.route('/materials/export')
 def export_materials():
-    # 获取筛选参数
     material_ids = request.args.get('material_ids', '')
     id_list = [int(id) for id in material_ids.split(',') if id] if material_ids else []
     return material_service.export_to_excel(id_list)

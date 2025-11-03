@@ -1,15 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-@Author  : nickdecodes
-@Email   : 
-@Usage   : 
-@Filename: product_service.py
-@DateTime: 2025/10/25 23:17
-@Software: vscode
-"""
-
 from dbs.db_manager import DBManager
 from dbs.models import Product, Material, OperationRecord
 from services.material_service import MaterialService
@@ -25,26 +16,107 @@ class ProductService:
         self.material_service = MaterialService()
         self.logger = logging.getLogger(__name__)
     
+    def _parse_used_list(self, used_by_products_str: str) -> list:
+        """解析used_by_products JSON字符串"""
+        try:
+            return json.loads(used_by_products_str or '[]')
+        except (json.JSONDecodeError, TypeError):
+            self.logger.warning(f'解析used_by_products失败: {used_by_products_str}')
+            return []
+    
+    def _serialize_used_list(self, used_list: list) -> str:
+        """序列化used_by_products列表"""
+        return json.dumps(used_list)
+    
+    def _validate_materials(self, session, materials: dict) -> tuple:
+        """验证材料是否存在，返回(是否有效, 错误信息, 材料对象字典)"""
+        if not materials:
+            return False, '产品必须包含至少一个材料', {}
+        
+        material_objs = {}
+        for material_id_str in materials.keys():
+            try:
+                material_id = int(material_id_str)
+                material = session.query(Material).filter(Material.id == material_id).first()
+                if not material:
+                    return False, f'材料ID {material_id} 不存在', {}
+                material_objs[material_id_str] = material
+            except (ValueError, TypeError):
+                return False, f'无效的材料ID: {material_id_str}', {}
+        
+        return True, '', material_objs
+    
+    def _update_material_references(self, session, product_id: int, old_materials: dict, new_materials: dict):
+        """批量更新材料引用，返回是否成功"""
+        try:
+            old_ids = set(old_materials.keys())
+            new_ids = set(new_materials.keys())
+            
+            removed_ids = old_ids - new_ids
+            added_ids = new_ids - old_ids
+            
+            for material_id_str in removed_ids:
+                material = session.query(Material).filter(Material.id == int(material_id_str)).first()
+                if material:
+                    used_list = self._parse_used_list(material.used_by_products)
+                    if product_id in used_list:
+                        used_list.remove(product_id)
+                        material.used_by_products = self._serialize_used_list(used_list)
+                        self.logger.debug(f'移除产品{product_id}从材料{material_id_str}的引用列表')
+            
+            for material_id_str in added_ids:
+                material = session.query(Material).filter(Material.id == int(material_id_str)).first()
+                if material:
+                    used_list = self._parse_used_list(material.used_by_products)
+                    if product_id not in used_list:
+                        used_list.append(product_id)
+                        material.used_by_products = self._serialize_used_list(used_list)
+                        self.logger.debug(f'添加产品{product_id}到材料{material_id_str}的引用列表')
+            
+            return True
+        except Exception as e:
+            self.logger.error(f'更新材料引用失败: {str(e)}', exc_info=True)
+            return False
+    
     def add_product(self, name: str, materials: dict, in_price: float = 0, out_price: float = 0, manual_price: float = 0, username: str = '', image_path: str = None) -> dict:
         """添加产品"""
         session = self.db.get_session()
         try:
-            materials_json = json.dumps(materials)
+            self.logger.info(f'开始添加产品: {name}, 材料数: {len(materials)}, 用户: {username}')
             
-            # 创建产品对象
+            valid, error_msg, material_objs = self._validate_materials(session, materials)
+            if not valid:
+                self.logger.warning(f'产品添加验证失败: {error_msg}')
+                return {'success': False, 'message': error_msg}
+            
+            calculated_in_price = 0
+            for material_id_str, required_qty in materials.items():
+                material = material_objs.get(material_id_str)
+                if material:
+                    calculated_in_price += (material.in_price or 0) * required_qty
+            
+            manual_price = manual_price or 0
+            calculated_out_price = calculated_in_price + manual_price
+            
+            materials_json = json.dumps(materials)
             product = Product(
                 name=name,
                 materials=materials_json,
-                in_price=in_price,
-                out_price=out_price,
+                in_price=calculated_in_price,
+                out_price=calculated_out_price,
                 manual_price=manual_price,
                 image_path=image_path
             )
             
             session.add(product)
-            session.flush()  # 获取ID但不提交
+            session.flush()
             
-            # 记录添加操作
+            for material_id_str, material in material_objs.items():
+                used_list = self._parse_used_list(material.used_by_products)
+                if product.id not in used_list:
+                    used_list.append(product.id)
+                    material.used_by_products = self._serialize_used_list(used_list)
+            
             operation = OperationRecord(
                 operation_type='添加产品',
                 name=name,
@@ -55,14 +127,15 @@ class ProductService:
             session.add(operation)
             
             if self.db.commit_session(session):
+                self.logger.info(f'产品添加成功: {product.id} - {name}')
                 return {'success': True, 'product_id': product.id}
             else:
-                return {'success': False}
+                return {'success': False, 'message': '数据库提交失败'}
                 
         except Exception as e:
             session.rollback()
             self.logger.error(f'产品添加异常: {name} - {str(e)}', exc_info=True)
-            return {'success': False}
+            return {'success': False, 'message': '添加失败'}
         finally:
             self.db.close_session(session)
     
@@ -72,13 +145,11 @@ class ProductService:
         
         result = []
         for product in products:
-            # 解析材料JSON字符串
             try:
                 product_materials = json.loads(product.materials)
             except:
                 product_materials = {}
             
-            # 计算可制作数量
             possible_quantity = float('inf')
             materials_with_stock = []
             
@@ -186,7 +257,6 @@ class ProductService:
         
         session = self.db.get_session()
         try:
-            # 获取产品信息
             product = session.query(Product).filter(Product.id == product_id).first()
             if not product:
                 self.logger.warning(f'产品删除失败: 产品不存在 - {product_id}')
@@ -195,14 +265,17 @@ class ProductService:
             product_name = product.name
             stock_count = product.stock_count
             
-            # 检查已制作数量
             if stock_count > 0:
-                return {'success': False, 'message': f'产品 {product_name} 已制作数量不为零（{stock_count}个），请先出库或还原后再删除'}
+                msg = f'产品 {product_name} 已制作数量不为零（{stock_count}个），请先出库或还原后再删除'
+                self.logger.warning(f'产品删除失败: {msg}')
+                return {'success': False, 'message': msg}
             
-            # 删除配方
+            materials = json.loads(product.materials or '{}')
+            if not self._update_material_references(session, product_id, materials, {}):
+                return {'success': False, 'message': '更新材料引用失败'}
+            
             session.delete(product)
             
-            # 记录删除操作
             operation = OperationRecord(
                 operation_type='删除产品',
                 name=product_name,
@@ -227,68 +300,102 @@ class ProductService:
     
     def batch_delete_products(self, product_ids: list, username: str = '') -> dict:
         """批量删除产品"""
+        self.logger.info(f'开始批量删除产品: {len(product_ids)}个, 用户: {username}')
+        session = self.db.get_session()
+        
         try:
+            products = session.query(Product).filter(Product.id.in_(product_ids)).all()
             failed_products = []
             deleted_count = 0
             
-            for product_id in product_ids:
-                result = self.delete_product(product_id, username)
-                if result['success']:
-                    deleted_count += 1
-                else:
+            for product in products:
+                if product.stock_count and product.stock_count > 0:
                     failed_products.append({
-                        'id': product_id,
-                        'message': result['message']
+                        'name': product.name,
+                        'reason': f'已制作数量不为零（{product.stock_count}个），请先出库或还原后再删除'
                     })
-            
-            if failed_products:
-                failed_list = []
-                for failed in failed_products:
-                    # 获取产品名称和失败原因
-                    session = self.db.get_session()
-                    try:
-                        product = session.query(Product).filter(Product.id == failed['id']).first()
-                        if product:
-                            failed_list.append({
-                                'name': product.name,
-                                'reason': failed['message']
-                            })
-                    finally:
-                        self.db.close_session(session)
+                    continue
                 
-                return {
-                    'success': False,
-                    'deleted_count': deleted_count,
-                    'failed_products': failed_list,
-                    'should_close': deleted_count > 0
-                }
-            else:
+                materials = json.loads(product.materials or '{}')
+                if not self._update_material_references(session, product.id, materials, {}):
+                    failed_products.append({
+                        'name': product.name,
+                        'reason': '更新材料引用失败'
+                    })
+                    continue
+                
+                session.delete(product)
+                deleted_count += 1
+            
+            if deleted_count > 0:
+                operation = OperationRecord(
+                    operation_type='批量删除产品',
+                    name=f'批量删除{deleted_count}个产品',
+                    quantity=deleted_count,
+                    detail=f'批量删除产品ID: {product_ids}',
+                    username=username
+                )
+                session.add(operation)
+            
+            if self.db.commit_session(session):
+                self.logger.info(f'批量删除成功: {deleted_count}个产品')
+                if failed_products:
+                    return {
+                        'success': False,
+                        'deleted_count': deleted_count,
+                        'failed_products': failed_products,
+                        'should_close': deleted_count > 0
+                    }
                 return {'success': True, 'message': f'成功删除 {deleted_count} 个产品'}
+            else:
+                return {'success': False, 'message': '批量删除失败'}
+                
         except Exception as e:
+            session.rollback()
+            self.logger.error(f'批量删除产品异常: {str(e)}', exc_info=True)
             return {'success': False, 'message': '批量删除失败'}
+        finally:
+            self.db.close_session(session)
 
-    def update_product(self, product_id: int, name: str, materials: dict = None, in_price: float = None, out_price: float = None, manual_price: float = None, username: str = '', image_path: str = None) -> bool:
+    def update_product(self, product_id: int, name: str, materials: dict = None, in_price: float = None, out_price: float = None, manual_price: float = None, username: str = '', image_path: str = None) -> dict:
         """更新产品"""
+        self.logger.info(f'开始更新产品: {product_id}, 用户: {username}')
         session = self.db.get_session()
+        
         try:
             product = session.query(Product).filter(Product.id == product_id).first()
             if not product:
-                return False
+                self.logger.warning(f'产品更新失败: 产品不存在 - {product_id}')
+                return {'success': False, 'message': '产品不存在'}
             
-            # 更新字段
-            product.name = name
             if materials is not None:
+                valid, error_msg, material_objs = self._validate_materials(session, materials)
+                if not valid:
+                    self.logger.warning(f'产品更新验证失败: {error_msg}')
+                    return {'success': False, 'message': error_msg}
+                
+                old_materials = json.loads(product.materials or '{}')
+                if not self._update_material_references(session, product_id, old_materials, materials):
+                    return {'success': False, 'message': '更新材料引用失败'}
+                
                 product.materials = json.dumps(materials)
-            if in_price is not None:
-                product.in_price = in_price
-            if out_price is not None:
-                product.out_price = out_price
+                
+                calculated_in_price = 0
+                for material_id_str, required_qty in materials.items():
+                    material = material_objs.get(material_id_str)
+                    if material:
+                        calculated_in_price += (material.in_price or 0) * required_qty
+                product.in_price = calculated_in_price
+            
+            product.name = name
             if manual_price is not None:
                 product.manual_price = manual_price
+            
+            product.out_price = (product.in_price or 0) + (product.manual_price or 0)
+            
             if image_path is not None:
                 product.image_path = image_path
             
-            # 记录更新操作
             operation = OperationRecord(
                 operation_type='更新产品',
                 name=name,
@@ -300,46 +407,48 @@ class ProductService:
             
             if self.db.commit_session(session):
                 self.logger.info(f'产品更新成功: {product_id} - {name}')
-                return True
+                return {'success': True}
             else:
-                return False
+                return {'success': False, 'message': '更新失败'}
             
         except Exception as e:
             session.rollback()
             self.logger.error(f'产品更新异常: {product_id} - {str(e)}', exc_info=True)
-            return False
+            return {'success': False, 'message': '更新失败'}
         finally:
             self.db.close_session(session)
     
-    def inbound(self, product_id: int, quantity: int, customer: str = '', username: str = '') -> bool:
+    def inbound(self, product_id: int, quantity: int, customer: str = '', username: str = '') -> dict:
         """入库产品"""
         self.logger.info(f'开始产品入库: {product_id}, 数量: {quantity}, 用户: {username}')
 
         session = self.db.get_session()
         try:
-            # 获取产品
             product = session.query(Product).filter(Product.id == product_id).first()
             if not product:
-                return False
+                self.logger.warning(f'产品入库失败: 产品不存在 - {product_id}')
+                return {'success': False, 'message': '产品不存在'}
             
             product_name = product.name
             materials = json.loads(product.materials)
             
-            # 检查材料是否足够
-            for material_id, required_qty in materials.items():
-                material = session.query(Material).filter(Material.id == int(material_id)).first()
-                if not material or material.stock_count < required_qty * quantity:
-                    return False
+            material_ids = [int(mid) for mid in materials.keys()]
+            materials_objs = session.query(Material).filter(Material.id.in_(material_ids)).all()
+            materials_map = {m.id: m for m in materials_objs}
             
-            # 消耗材料
-            for material_id, required_qty in materials.items():
-                material = session.query(Material).filter(Material.id == int(material_id)).first()
+            for material_id_str, required_qty in materials.items():
+                material = materials_map.get(int(material_id_str))
+                if not material or material.stock_count < required_qty * quantity:
+                    msg = f'材料库存不足: {material.name if material else material_id_str}'
+                    self.logger.warning(f'产品入库失败: {msg}')
+                    return {'success': False, 'message': msg}
+            
+            for material_id_str, required_qty in materials.items():
+                material = materials_map.get(int(material_id_str))
                 material.stock_count -= required_qty * quantity
             
-            # 增加配方的制作数量
             product.stock_count = (product.stock_count or 0) + quantity
             
-            # 记录操作
             detail = f'客户: {customer}, 产品制作数量: +{quantity}' if customer else f'产品制作数量: +{quantity}'
             operation = OperationRecord(
                 operation_type='产品入库',
@@ -350,12 +459,16 @@ class ProductService:
             )
             session.add(operation)
             
-            return self.db.commit_session(session)
+            if self.db.commit_session(session):
+                self.logger.info(f'产品入库成功: {product_id}, 数量: {quantity}')
+                return {'success': True}
+            else:
+                return {'success': False, 'message': '入库失败'}
             
         except Exception as e:
             session.rollback()
-            self.logger.error(f'产品入库失败: {product_id} - {str(e)}', exc_info=True)
-            return False
+            self.logger.error(f'产品入库异常: {product_id} - {str(e)}', exc_info=True)
+            return {'success': False, 'message': '入库失败'}
         finally:
             self.db.close_session(session)
     
@@ -372,12 +485,12 @@ class ProductService:
             product_name = product.name
             stock_count = product.stock_count or 0
             if stock_count < quantity:
-                return {'success': False, 'message': f'产品库存不足，当前: {stock_count}'}
+                msg = f'产品库存不足，当前: {stock_count}'
+                self.logger.warning(f'产品出库失败: {msg}')
+                return {'success': False, 'message': msg}
             
-            # 更新产品库存
             product.stock_count = stock_count - quantity
             
-            # 记录操作
             operation = OperationRecord(
                 operation_type='产品出库',
                 name=product_name,
@@ -388,6 +501,7 @@ class ProductService:
             session.add(operation)
             
             if self.db.commit_session(session):
+                self.logger.info(f'产品出库成功: {product_id}, 数量: {quantity}')
                 return {'success': True}
             else:
                 return {'success': False, 'message': '出库失败'}
@@ -399,28 +513,32 @@ class ProductService:
         finally:
             self.db.close_session(session)
     
-    def restore(self, product_id: int, quantity: int, reason: str = '', username: str = '') -> bool:
+    def restore(self, product_id: int, quantity: int, reason: str = '', username: str = '') -> dict:
         """产品还原"""
+        self.logger.info(f'开始产品还原: {product_id}, 数量: {quantity}, 用户: {username}')
         session = self.db.get_session()
+        
         try:
-            # 获取产品库存
             product = session.query(Product).filter(Product.id == product_id).first()
             if not product or (product.stock_count or 0) < quantity:
-                return False
+                msg = '产品不存在或库存不足'
+                self.logger.warning(f'产品还原失败: {msg}')
+                return {'success': False, 'message': msg}
             
             product_name = product.name
             materials = json.loads(product.materials)
             
-            # 还原材料
-            for material_id, required_qty in materials.items():
-                material = session.query(Material).filter(Material.id == int(material_id)).first()
+            material_ids = [int(mid) for mid in materials.keys()]
+            materials_objs = session.query(Material).filter(Material.id.in_(material_ids)).all()
+            materials_map = {m.id: m for m in materials_objs}
+            
+            for material_id_str, required_qty in materials.items():
+                material = materials_map.get(int(material_id_str))
                 if material:
                     material.stock_count += required_qty * quantity
             
-            # 更新产品库存
             product.stock_count = (product.stock_count or 0) - quantity
             
-            # 记录操作
             detail = f'还原数量: -{quantity}, 原因: {reason}' if reason else f'还原数量: -{quantity}'
             operation = OperationRecord(
                 operation_type='产品还原',
@@ -431,12 +549,16 @@ class ProductService:
             )
             session.add(operation)
             
-            return self.db.commit_session(session)
+            if self.db.commit_session(session):
+                self.logger.info(f'产品还原成功: {product_id}, 数量: {quantity}')
+                return {'success': True}
+            else:
+                return {'success': False, 'message': '还原失败'}
             
         except Exception as e:
             session.rollback()
-            self.logger.error(f'产品还原失败: {product_id} - {str(e)}', exc_info=True)
-            return False
+            self.logger.error(f'产品还原异常: {product_id} - {str(e)}', exc_info=True)
+            return {'success': False, 'message': '还原失败'}
         finally:
             self.db.close_session(session)
 
@@ -454,11 +576,7 @@ class ProductService:
         return {'success': False, 'message': '产品导入功能暂不支持，请手动添加'}
     
     def export_to_excel(self, product_ids: list = None):
-        """导出产品到Excel
-        
-        Args:
-            product_ids: 要导出的产品ID列表，如果为空则导出所有产品
-        """
+        """导出产品到Excel"""
         import openpyxl
         from flask import send_file
         from io import BytesIO
@@ -469,12 +587,10 @@ class ProductService:
         import os
         
         try:
-            # 创建工作簿
             wb = openpyxl.Workbook()
             ws = wb.active
             ws.title = '产品列表'
             
-            # 设置列宽和行高
             ws.column_dimensions['A'].width = 15
             ws.column_dimensions['B'].width = 15
             ws.column_dimensions['C'].width = 12
@@ -485,16 +601,13 @@ class ProductService:
             ws.column_dimensions['H'].width = 20
             ws.column_dimensions['I'].width = 20
             
-            # 写入表头
             headers = ['图片', '产品名称', '成本价', '售价', '手工费', '库存数量', '可制作数量', '创建时间', '更新时间']
             ws.append(headers)
             
-            # 从数据库查询产品
             session = self.db.get_session()
             try:
                 query = session.query(Product).order_by(Product.id)
                 
-                # 如果有筛选条件，只导出筛选后的产品
                 if product_ids:
                     query = query.filter(Product.id.in_(product_ids))
                 
@@ -503,7 +616,6 @@ class ProductService:
                 
                 row_idx = 2
                 for product in processed_products:
-                    # 写入数据
                     ws.append([
                         '',
                         product['name'],
@@ -516,10 +628,8 @@ class ProductService:
                         product['updated_at']
                     ])
                     
-                    # 设置行高
                     ws.row_dimensions[row_idx].height = 50
                     
-                    # 插入图片
                     if product.get('image_path'):
                         try:
                             image_path = product['image_path']
@@ -546,12 +656,10 @@ class ProductService:
             finally:
                 self.db.close_session(session)
             
-            # 保存到内存
             output = BytesIO()
             wb.save(output)
             output.seek(0)
             
-            # 生成文件名
             filename = f'products_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
             
             return send_file(
@@ -565,4 +673,3 @@ class ProductService:
             self.logger.error(f'导出Excel失败: {str(e)}', exc_info=True)
             from flask import jsonify
             return jsonify({'success': False, 'message': f'导出失败: {str(e)}'}), 500
-    

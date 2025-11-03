@@ -1,15 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-@Author  : nickdecodes
-@Email   : 
-@Usage   : 
-@Filename: product_api.py
-@DateTime: 2025/10/25 23:17
-@Software: vscode
-"""
-
 from flask import Blueprint, request, jsonify
 from services.product_service import ProductService
 from config import Config
@@ -17,7 +8,6 @@ from config import Config
 product_bp = Blueprint('product', __name__)
 product_service = ProductService()
 
-# 产品相关API
 @product_bp.route('/products', methods=['POST'])
 def add_product():
     data = request.json
@@ -32,7 +22,7 @@ def add_product():
     if result['success']:
         return jsonify({'success': True, 'product_id': result['product_id']})
     else:
-        return jsonify({'success': False, 'message': '产品添加失败'})
+        return jsonify(result)
 
 @product_bp.route('/products')
 def get_products():
@@ -64,11 +54,8 @@ def update_product(product_id):
     username = data.get('username', '')
     image_path = data.get('image_path')
     
-    success = product_service.update_product(product_id, name, materials, in_price, out_price, manual_price, username, image_path)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': '产品不存在或更新失败'})
+    result = product_service.update_product(product_id, name, materials, in_price, out_price, manual_price, username, image_path)
+    return jsonify(result)
 
 @product_bp.route('/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
@@ -98,11 +85,8 @@ def product_in():
     if not formula_id or not quantity:
         return jsonify({'success': False, 'message': '缺少必要参数'})
     
-    success = product_service.inbound(int(formula_id), quantity, customer, username)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': '配方不存在或材料不足'})
+    result = product_service.inbound(int(formula_id), quantity, customer, username)
+    return jsonify(result)
 
 @product_bp.route('/products/out', methods=['POST'])
 def product_out():
@@ -129,11 +113,8 @@ def product_restore():
     if not formula_id or not quantity or not reason:
         return jsonify({'success': False, 'message': '缺少必要参数'})
     
-    success = product_service.restore(int(formula_id), quantity, reason, username)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'message': '配方不存在或库存不足'})
+    result = product_service.restore(int(formula_id), quantity, reason, username)
+    return jsonify(result)
     
 @product_bp.route('/products/<int:product_id>/stock')
 def get_product_stock(product_id):
@@ -155,7 +136,6 @@ def import_products():
 
 @product_bp.route('/products/export')
 def export_products():
-    # 获取筛选参数
     product_ids = request.args.get('product_ids', '')
     id_list = [int(id) for id in product_ids.split(',') if id] if product_ids else []
     return product_service.export_to_excel(id_list)

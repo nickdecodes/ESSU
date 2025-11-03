@@ -1,5 +1,5 @@
 import { AppstoreOutlined, BarChartOutlined, DeleteOutlined, DownOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PictureOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import { api } from '../utils/api';
@@ -27,6 +27,11 @@ const Material = ({ user }) => {
   const [editFileList, setEditFileList] = useState([]);
   const [editLoading, setEditLoading] = useState(false);
   const [batchDeleteLoading, setBatchDeleteLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [inLoading, setInLoading] = useState(false);
+  const [outLoading, setOutLoading] = useState(false);
   const [priceConfirmModalVisible, setPriceConfirmModalVisible] = useState(false);
   const [pendingUpdateData, setPendingUpdateData] = useState(null);
   const [affectedProducts, setAffectedProducts] = useState([]);
@@ -70,14 +75,12 @@ const Material = ({ user }) => {
     if (editLoading) return;
     setEditLoading(true);
     try {
-      // 检查是否有相关产品受影响
       const checkResponse = await api.checkRelatedProducts(editingRecord.id, {
         in_price: values.in_price,
         out_price: values.out_price
       });
       
       if (checkResponse.data.success && checkResponse.data.price_changed && checkResponse.data.affected_products.length > 0) {
-        // 有产品受影响，显示确认弹窗
         setAffectedProducts(checkResponse.data.affected_products);
         setPendingUpdateData(values);
         setPriceConfirmModalVisible(true);
@@ -85,7 +88,6 @@ const Material = ({ user }) => {
         return;
       }
       
-      // 没有产品受影响，直接更新
       await performUpdate(values);
       
     } catch (error) {
@@ -97,21 +99,32 @@ const Material = ({ user }) => {
   const performUpdate = async (values) => {
     try {
       const image_path = editFileList[0]?.response?.image_path || (editFileList[0]?.url ? editingRecord.image_path : null);
+      const startTime = Date.now();
       const response = await api.updateMaterial(editingRecord.id, { ...values, username: user.username, image_path });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       
       if (response.data.success) {
-        message.success('材料更新成功');
+        message.success('材料更新成功' + (response.data.price_changed ? '，产品价格已自动更新' : ''));
+        setPriceConfirmModalVisible(false);
         setEditModalVisible(false);
         editForm.resetFields();
         setEditingRecord(null);
         setEditFileList([]);
+        setPendingUpdateData(null);
+        setAffectedProducts([]);
+        setEditLoading(false);
         loadMaterials(message.error);
       } else {
         message.error(response.data.message || '材料更新失败');
+        setEditLoading(false);
       }
     } catch (error) {
       message.error('材料更新失败');
-    } finally {
       setEditLoading(false);
     }
   };
@@ -128,11 +141,20 @@ const Material = ({ user }) => {
     if (batchDeleteLoading) return;
     setBatchDeleteLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.batchDeleteMaterials(selectedRowKeys, user.username);
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success(response.data.message || `成功删除 ${selectedRowKeys.length} 个材料`);
         setBatchDeleteModalVisible(false);
         setSelectedRowKeys([]);
+        setBatchDeleteLoading(false);
         loadMaterials(message.error);
       } else {
         // 显示错误信息，但如果有删除成功的材料，仍然关闭弹窗并刷新
@@ -181,12 +203,14 @@ const Material = ({ user }) => {
         if (response.data.should_close) {
           setBatchDeleteModalVisible(false);
           setSelectedRowKeys([]);
+          setBatchDeleteLoading(false);
           loadMaterials(message.error);
+        } else {
+          setBatchDeleteLoading(false);
         }
       }
     } catch (error) {
       message.error('批量删除失败');
-    } finally {
       setBatchDeleteLoading(false);
     }
   };
@@ -220,55 +244,98 @@ const Material = ({ user }) => {
   };
 
   const addMaterial = async (values) => {
+    setAddLoading(true);
     try {
+      const startTime = Date.now();
       const hasFile = fileList?.length > 0 && fileList[0].originFileObj;
       const response = hasFile
         ? await uploadFormData('/materials', {...values, username: user.username, out_price: values.out_price || values.in_price}, fileList[0].originFileObj, 'image')
         : await api.addMaterial({...values, username: user.username});
       
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success('材料添加成功');
+        setAddModalVisible(false);
         addForm.resetFields();
         setFileList([]);
+        setAddLoading(false);
         loadMaterials(message.error);
       } else {
         message.error(response.data.message || '材料添加失败');
+        setAddLoading(false);
       }
     } catch (error) {
       console.error('材料添加失败:', error);
       message.error('材料添加失败');
+      setAddLoading(false);
     }
   };
 
   const inbound = async (values) => {
+    if (inLoading) return;
+    setInLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.materialIn({...values, username: user.username});
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success('入库成功');
+        setInModalVisible(false);
         inForm.resetFields();
+        setSelectedMaterial(null);
+        setInLoading(false);
         loadMaterials(message.error);
       } else {
         message.error(response.data.message || '入库失败');
+        setInLoading(false);
       }
     } catch (error) {
       console.error('入库失败', error);
       message.error('入库失败');
+      setInLoading(false);
     }
   };
 
   const outbound = async (values) => {
+    if (outLoading) return;
+    setOutLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.materialOut({...values, username: user.username});
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success('出库成功');
+        setOutModalVisible(false);
         outForm.resetFields();
+        setSelectedMaterial(null);
+        setOutLoading(false);
         loadMaterials(message.error);
       } else {
         message.error(response.data.message || '出库失败');
+        setOutLoading(false);
       }
     } catch (error) {
       console.error('出库失败', error);
       message.error('出库失败');
+      setOutLoading(false);
     }
   };
 
@@ -625,12 +692,21 @@ const Material = ({ user }) => {
     const file = e.target.files[0];
     if (!file) return;
     
+    setImportLoading(true);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('username', user.username);
     
     try {
+      const startTime = Date.now();
       const response = await api.importMaterials(formData);
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success(response.data.message || '导入成功');
         loadMaterials();
@@ -640,11 +716,13 @@ const Material = ({ user }) => {
     } catch (error) {
       console.error('导入失败:', error);
       message.error('导入失败');
+    } finally {
+      setImportLoading(false);
+      e.target.value = '';
     }
-    e.target.value = '';
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const materials = selectedRowKeys.length > 0 
       ? selectedRowKeys 
       : getFilteredMaterials().map(m => m.id);
@@ -657,8 +735,16 @@ const Material = ({ user }) => {
       return;
     }
     
-    const materialIds = materials.join(',');
-    window.open(`${Config.API_BASE_URL}/materials/export?material_ids=${materialIds}`, '_blank');
+    setExportLoading(true);
+    try {
+      const startTime = Date.now();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const materialIds = materials.join(',');
+      window.open(`${Config.API_BASE_URL}/materials/export?material_ids=${materialIds}`, '_blank');
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   return (
@@ -869,6 +955,8 @@ const Material = ({ user }) => {
                     <Button 
                       icon={<ImportOutlined />}
                       onClick={() => document.getElementById('material-import-input').click()}
+                      loading={importLoading}
+                      disabled={importLoading}
                       block
                     >
                       导入
@@ -878,6 +966,8 @@ const Material = ({ user }) => {
                     <Button 
                       icon={<ExportOutlined />}
                       onClick={handleExport}
+                      loading={exportLoading}
+                      disabled={exportLoading}
                       block
                     >
                       导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
@@ -1004,12 +1094,16 @@ const Material = ({ user }) => {
                   <Button 
                     icon={<ImportOutlined />}
                     onClick={() => document.getElementById('material-import-input').click()}
+                    loading={importLoading}
+                    disabled={importLoading}
                   >
                     导入
                   </Button>
                   <Button 
                     icon={<ExportOutlined />}
                     onClick={handleExport}
+                    loading={exportLoading}
+                    disabled={exportLoading}
                   >
                     导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
                   </Button>
@@ -1044,10 +1138,9 @@ const Material = ({ user }) => {
         width={isMobile ? '95%' : 450}
         style={{ top: isMobile ? 20 : 100 }}
       >
+        <Spin spinning={inLoading} tip="入库中...">
         <Form form={inForm} layout="vertical" onFinish={(values) => {
           inbound({ ...values, material_id: selectedMaterial.id });
-          setInModalVisible(false);
-          setSelectedMaterial(null);
         }}>
           <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, border: '1px solid #d9d9d9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1087,15 +1180,16 @@ const Material = ({ user }) => {
                 setInModalVisible(false);
                 inForm.resetFields();
                 setSelectedMaterial(null);
-              }}>
+              }} disabled={inLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit" style={{ borderRadius: '6px' }}>
+              <Button type="primary" htmlType="submit" loading={inLoading} disabled={inLoading} style={{ borderRadius: '6px' }}>
                 入库
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1110,10 +1204,9 @@ const Material = ({ user }) => {
         width={isMobile ? '95%' : 450}
         style={{ top: isMobile ? 20 : 100 }}
       >
+        <Spin spinning={outLoading} tip="出库中...">
         <Form form={outForm} layout="vertical" onFinish={(values) => {
           outbound({ ...values, material_id: selectedMaterial.id });
-          setOutModalVisible(false);
-          setSelectedMaterial(null);
         }}>
           <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, border: '1px solid #d9d9d9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1159,15 +1252,16 @@ const Material = ({ user }) => {
                 setOutModalVisible(false);
                 outForm.resetFields();
                 setSelectedMaterial(null);
-              }}>
+              }} disabled={outLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit" style={{ borderRadius: '6px' }}>
+              <Button type="primary" htmlType="submit" loading={outLoading} disabled={outLoading} style={{ borderRadius: '6px' }}>
                 出库
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1182,9 +1276,9 @@ const Material = ({ user }) => {
         width={isMobile ? '95%' : 600}
         style={{ top: isMobile ? 20 : 100 }}
       >
+        <Spin spinning={addLoading} tip="添加中...">
         <Form form={addForm} layout="vertical" onFinish={(values) => {
           addMaterial(values);
-          setAddModalVisible(false);
         }}>
           <Form.Item 
             name="name" 
@@ -1254,12 +1348,13 @@ const Material = ({ user }) => {
               }}>
                 清空
               </Button>
-              <Button type="primary" htmlType="submit" style={{ borderRadius: '6px' }}>
+              <Button type="primary" htmlType="submit" loading={addLoading} disabled={addLoading} style={{ borderRadius: '6px' }}>
                 添加
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1314,16 +1409,17 @@ const Material = ({ user }) => {
         title="批量删除材料"
         open={batchDeleteModalVisible}
         onOk={handleBatchDelete}
-        confirmLoading={batchDeleteLoading}
         onCancel={() => {
           setBatchDeleteModalVisible(false);
         }}
-        okText="确定删除"
+        okText="确定"
         cancelText="取消"
-        okButtonProps={{ danger: true }}
+        okButtonProps={{ danger: true, disabled: batchDeleteLoading }}
+        cancelButtonProps={{ disabled: batchDeleteLoading }}
       >
+        <Spin spinning={batchDeleteLoading} tip="删除中...">
         <p>确定要删除以下 {selectedRowKeys.length} 个材料吗？</p>
-        <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '6px', margin: '12px 0', maxHeight: '200px', overflow: 'auto' }}>
+        <div style={{ padding: '12px', borderRadius: '6px', margin: '12px 0', maxHeight: '200px', overflow: 'auto', border: '1px solid #d9d9d9' }}>
           {selectedRowKeys.map(materialId => {
             const material = materials.find(m => m.id === materialId);
             return material ? (
@@ -1342,10 +1438,10 @@ const Material = ({ user }) => {
                   />
                 ) : (
                   <div style={{
-                    width: '24px', height: '24px', background: '#e0e0e0', borderRadius: '4px',
+                    width: '24px', height: '24px', background: '#fafafa', borderRadius: '4px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
-                    <PictureOutlined style={{ color: '#999', fontSize: '12px' }} />
+                    <PictureOutlined style={{ color: '#bfbfbf', fontSize: '12px' }} />
                   </div>
                 )}
                 <strong>{material.name}</strong>
@@ -1354,6 +1450,7 @@ const Material = ({ user }) => {
           })}
         </div>
         <p style={{ color: '#ff4d4f', fontSize: '14px' }}>⚠️ 此操作不可撤销，请谨慎操作！</p>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1370,93 +1467,80 @@ const Material = ({ user }) => {
         title="价格变动确认"
         open={priceConfirmModalVisible}
         onOk={handlePriceConfirm}
-        confirmLoading={editLoading}
         onCancel={() => {
           setPriceConfirmModalVisible(false);
           setPendingUpdateData(null);
           setAffectedProducts([]);
         }}
-        okText="确认更新"
+        okText="确认"
         cancelText="取消"
         width={700}
+        okButtonProps={{ disabled: editLoading }}
+        cancelButtonProps={{ disabled: editLoading }}
       >
+        <Spin spinning={editLoading} tip="更新中...">
         <div style={{ marginBottom: '16px' }}>
           <p style={{ color: '#faad14', fontWeight: '500', marginBottom: '12px' }}>
             ⚠️ 材料价格变动将会影响以下产品的成本和售价：
           </p>
-          <div style={{ 
-            background: '#f5f5f5', 
-            padding: '12px', 
-            borderRadius: '6px', 
-            maxHeight: '300px', 
-            overflow: 'auto' 
-          }}>
+          <div style={{ maxHeight: '300px', overflow: 'auto' }}>
             {affectedProducts.map(product => (
               <div key={product.id} style={{ 
-                padding: '8px',
+                padding: '12px',
                 marginBottom: '8px',
-                background: '#fff',
                 borderRadius: '4px',
-                border: '1px solid #e0e0e0',
+                border: '1px solid #d9d9d9',
                 display: 'grid',
                 gridTemplateColumns: '60px 1fr',
                 gap: '12px',
                 alignItems: 'center'
               }}>
                 <div>
-                  {material.image_path ? (
+                  {product.image_path ? (
                     <img 
-                      src={`http://localhost:5274/${material.image_path}`} 
+                      src={`http://localhost:5274/${product.image_path}`} 
                       alt=""
                       style={{ 
                         width: '50px', 
                         height: '50px', 
                         borderRadius: '4px', 
-                        objectFit: 'cover',
-                        border: '1px solid #e0e0e0'
+                        objectFit: 'cover'
                       }}
                     />
                   ) : (
                     <div style={{
                       width: '50px', 
                       height: '50px', 
-                      background: '#f5f5f5', 
+                      background: '#fafafa', 
                       borderRadius: '4px',
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center',
-                      border: '1px solid #e0e0e0'
+                      justifyContent: 'center'
                     }}>
-                      <PictureOutlined style={{ color: '#ccc', fontSize: '16px' }} />
+                      <PictureOutlined style={{ color: '#bfbfbf', fontSize: '16px' }} />
                     </div>
                   )}
                 </div>
                 <div>
-                  <div style={{ fontWeight: '500', marginBottom: '8px', fontSize: '14px' }}>
+                  <div style={{ fontWeight: '500', marginBottom: '8px' }}>
                     {product.name}
                   </div>
-                  <div style={{ 
-                    fontSize: '11px', 
-                    color: '#999', 
-                    marginBottom: '6px',
-                    maxHeight: '40px',
-                    overflowY: 'auto',
-                    padding: '2px 0'
-                  }}>
+                  <div style={{ fontSize: '12px', marginBottom: '6px' }}>
                     材料清单：{product.materials || '无'}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#666', lineHeight: '1.4' }}>
-                    <div>成本：¥{product.current_cost} {'->'} ¥{product.new_cost}</div>
-                    <div>售价：¥{product.current_selling} {'->'} ¥{product.new_selling}</div>
+                  <div style={{ fontSize: '12px' }}>
+                    <div>成本：¥{product.current_cost} → ¥{product.new_cost}</div>
+                    <div>售价：¥{product.current_selling} → ¥{product.new_selling}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <p style={{ marginTop: '12px', fontSize: '14px', color: '#666' }}>
+          <p style={{ marginTop: '12px' }}>
             系统将自动更新这些产品的价格，是否继续？
           </p>
         </div>
+        </Spin>
       </Modal>
     </>
   );

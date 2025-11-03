@@ -5,7 +5,6 @@ from dbs.db_manager import DBManager
 from dbs.models import Material, OperationRecord
 from utils.timezone_utils import format_china_time
 import logging
-import json
 
 class MaterialService:
     """材料服务 - 负责材料的增删改查和库存管理"""
@@ -13,25 +12,6 @@ class MaterialService:
     def __init__(self):
         self.db = DBManager()
         self.logger = logging.getLogger(__name__)
-    
-    def _parse_used_list(self, used_by_products_str: str) -> list:
-        """解析used_by_products JSON字符串"""
-        try:
-            return json.loads(used_by_products_str or '[]')
-        except (json.JSONDecodeError, TypeError):
-            self.logger.warning(f'解析used_by_products失败: {used_by_products_str}')
-            return []
-    
-    def get_products_using_material(self, material_id: int) -> list:
-        """获取使用该材料的产品ID列表"""
-        session = self.db.get_session()
-        try:
-            material = session.query(Material).filter(Material.id == material_id).first()
-            if not material:
-                return []
-            return self._parse_used_list(material.used_by_products)
-        finally:
-            self.db.close_session(session)
     
     def add_material(self, name: str, in_price: float, out_price: float = None, username: str = '', image_path: str = None) -> dict:
         """添加材料"""
@@ -65,13 +45,12 @@ class MaterialService:
                 self.logger.info(f'材料添加成功: {material.id} - {name}')
                 return {'success': True, 'material_id': material.id}
             else:
-                self.logger.error(f'材料添加失败: 数据库提交失败 - {name}')
-                return {'success': False, 'message': '数据库提交失败'}
+                return {'success': False}
                 
         except Exception as e:
             session.rollback()
             self.logger.error(f'材料添加异常: {name} - {str(e)}', exc_info=True)
-            return {'success': False, 'message': '添加失败'}
+            return {'success': False}
         finally:
             self.db.close_session(session)
     
@@ -87,8 +66,7 @@ class MaterialService:
                 'out_price': m.out_price,
                 'stock_count': m.stock_count,
                 'image_path': m.image_path,
-                'used_by_products': self._parse_used_list(m.used_by_products),
-                'is_used': len(self._parse_used_list(m.used_by_products)) > 0,
+                'used_by_products': m.used_by_products,
                 'created_at': format_china_time(m.created_at),
                 'updated_at': format_china_time(m.updated_at)
             } for m in materials]
@@ -107,8 +85,7 @@ class MaterialService:
                 'out_price': m.out_price,
                 'stock_count': m.stock_count,
                 'image_path': m.image_path,
-                'used_by_products': self._parse_used_list(m.used_by_products),
-                'is_used': len(self._parse_used_list(m.used_by_products)) > 0,
+                'used_by_products': m.used_by_products,
                 'created_at': format_china_time(m.created_at),
                 'updated_at': format_china_time(m.updated_at)
             } for m in materials]
@@ -122,6 +99,29 @@ class MaterialService:
             return session.query(Material).count()
         finally:
             self.db.close_session(session)
+    
+    def _update_material_usage_count(self, session, material_id: int):
+        """更新材料的使用计数"""
+        from dbs.models import Product
+        import json
+        
+        material = session.query(Material).filter(Material.id == material_id).first()
+        if not material:
+            return
+        
+        count = 0
+        products = session.query(Product).all()
+        material_id_str = str(material_id)
+        
+        for product in products:
+            try:
+                product_materials = json.loads(product.materials)
+                if material_id_str in product_materials:
+                    count += 1
+            except (json.JSONDecodeError, ValueError):
+                continue
+        
+        material.used_by_products = count
     
     def delete_material(self, material_id: int, username: str = '') -> dict:
         """删除材料"""
@@ -138,15 +138,10 @@ class MaterialService:
             stock_count = material.stock_count
             
             if stock_count > 0:
-                msg = f'材料 {material_name} 库存不为零（{stock_count}个），请先出库后再删除'
-                self.logger.warning(f'材料删除失败: {msg}')
-                return {'success': False, 'message': msg}
+                return {'success': False, 'message': f'材料 {material_name} 库存不为零（{stock_count}个），请先出库后再删除'}
             
-            used_list = self._parse_used_list(material.used_by_products)
-            if len(used_list) > 0:
-                msg = f'被{len(used_list)}个产品使用，请先删除相关产品'
-                self.logger.warning(f'材料删除失败: {msg}')
-                return {'success': False, 'message': msg}
+            if material.used_by_products > 0:
+                return {'success': False, 'message': f'被{material.used_by_products}个产品使用，请先删除相关产品'}
             
             session.delete(material)
             
@@ -163,7 +158,6 @@ class MaterialService:
                 self.logger.info(f'材料删除成功: {material_id} - {material_name}')
                 return {'success': True}
             else:
-                self.logger.error(f'材料删除失败: 数据库提交失败 - {material_id}')
                 return {'success': False, 'message': '删除失败'}
                 
         except Exception as e:
@@ -175,68 +169,51 @@ class MaterialService:
     
     def batch_delete_materials(self, material_ids: list, username: str = '') -> dict:
         """批量删除材料"""
-        self.logger.info(f'开始批量删除材料: {len(material_ids)}个, 用户: {username}')
-        session = self.db.get_session()
-        
         try:
-            materials = session.query(Material).filter(Material.id.in_(material_ids)).all()
             failed_materials = []
             deleted_count = 0
             
-            for material in materials:
-                if material.stock_count > 0:
+            for material_id in material_ids:
+                result = self.delete_material(material_id, username)
+                if result['success']:
+                    deleted_count += 1
+                else:
                     failed_materials.append({
-                        'name': material.name,
-                        'reason': f'库存不为零（{material.stock_count}个），请先出库后再删除'
+                        'id': material_id,
+                        'message': result['message']
                     })
-                    continue
-                
-                used_list = self._parse_used_list(material.used_by_products)
-                if len(used_list) > 0:
-                    failed_materials.append({
-                        'name': material.name,
-                        'reason': f'被{len(used_list)}个产品使用，请先删除相关产品'
-                    })
-                    continue
-                
-                session.delete(material)
-                deleted_count += 1
             
-            if deleted_count > 0:
-                operation = OperationRecord(
-                    operation_type='批量删除材料',
-                    name=f'批量删除{deleted_count}个材料',
-                    quantity=deleted_count,
-                    detail=f'批量删除材料ID: {material_ids}',
-                    username=username
-                )
-                session.add(operation)
-            
-            if self.db.commit_session(session):
-                self.logger.info(f'批量删除成功: {deleted_count}个材料')
-                if failed_materials:
-                    return {
-                        'success': False,
-                        'deleted_count': deleted_count,
-                        'failed_materials': failed_materials,
-                        'should_close': deleted_count > 0
-                    }
-                return {'success': True, 'message': f'成功删除 {deleted_count} 个材料'}
+            if failed_materials:
+                failed_list = []
+                for failed in failed_materials:
+                    session = self.db.get_session()
+                    try:
+                        material = session.query(Material).filter(Material.id == failed['id']).first()
+                        if material:
+                            failed_list.append({
+                                'name': material.name,
+                                'reason': failed['message']
+                            })
+                    finally:
+                        self.db.close_session(session)
+                
+                return {
+                    'success': False,
+                    'deleted_count': deleted_count,
+                    'failed_materials': failed_list,
+                    'should_close': deleted_count > 0
+                }
             else:
-                return {'success': False, 'message': '批量删除失败'}
-                
+                return {'success': True, 'message': f'成功删除 {deleted_count} 个材料'}
         except Exception as e:
-            session.rollback()
-            self.logger.error(f'批量删除材料异常: {str(e)}', exc_info=True)
             return {'success': False, 'message': '批量删除失败'}
-        finally:
-            self.db.close_session(session)
     
     def check_related_products(self, material_id: int, in_price: float = None, out_price: float = None) -> dict:
         """检查使用该材料的产品列表"""
         session = self.db.get_session()
         try:
             from dbs.models import Product
+            import json
             
             material = session.query(Material).filter(Material.id == material_id).first()
             if not material:
@@ -312,16 +289,13 @@ class MaterialService:
         finally:
             self.db.close_session(session)
     
-    def update_material(self, material_id: int, name: str, in_price: float = None, out_price: float = None, username: str = '', image_path: str = None) -> dict:
+    def update_material(self, material_id: int, name: str, in_price: float = None, out_price: float = None, username: str = '', image_path: str = None) -> bool:
         """更新材料信息"""
-        self.logger.info(f'开始更新材料: {material_id}, 用户: {username}')
         session = self.db.get_session()
-        
         try:
             material = session.query(Material).filter(Material.id == material_id).first()
             if not material:
-                self.logger.warning(f'材料更新失败: 材料不存在 - {material_id}')
-                return {'success': False, 'message': '材料不存在'}
+                return False
             
             price_changed = False
             if in_price is not None and material.in_price != in_price:
@@ -351,21 +325,21 @@ class MaterialService:
             
             if self.db.commit_session(session):
                 self.logger.info(f'材料更新成功: {material_id} - {name}')
-                return {'success': True, 'price_changed': price_changed}
+                return True
             else:
-                self.logger.error(f'材料更新失败: 数据库提交失败 - {material_id}')
-                return {'success': False, 'message': '更新失败'}
+                return False
                 
         except Exception as e:
             session.rollback()
             self.logger.error(f'材料更新异常: {material_id} - {str(e)}', exc_info=True)
-            return {'success': False, 'message': '更新失败'}
+            return False
         finally:
             self.db.close_session(session)
     
     def _update_related_products_price(self, session, material_id: int):
         """更新使用该材料的产品价格"""
         from dbs.models import Product
+        import json
         
         try:
             products = session.query(Product).all()
@@ -377,16 +351,18 @@ class MaterialService:
                     
                     if material_id_str in materials:
                         total_in_price = 0
+                        total_out_price = 0
                         
                         for mat_id, required_qty in materials.items():
                             material = session.query(Material).filter(Material.id == int(mat_id)).first()
                             if material:
                                 total_in_price += (material.in_price or 0) * required_qty
+                                total_out_price += (material.out_price or 0) * required_qty
                         
                         product.in_price = total_in_price
-                        product.out_price = total_in_price + (product.manual_price or 0)
+                        product.out_price = total_out_price + (product.manual_price or 0)
                         
-                        self.logger.debug(f'更新产品价格: {product.name} - 成本: {total_in_price}, 售价: {product.out_price}')
+                        self.logger.info(f'更新产品价格: {product.name} - 成本: {total_in_price}, 售价: {product.out_price}')
                         
                 except (json.JSONDecodeError, ValueError) as e:
                     self.logger.warning(f'解析产品材料失败: {product.id} - {str(e)}')
@@ -395,7 +371,7 @@ class MaterialService:
         except Exception as e:
             self.logger.error(f'更新相关产品价格失败: {str(e)}', exc_info=True)
     
-    def inbound(self, material_id: int, quantity: int, supplier: str, username: str = '') -> dict:
+    def inbound(self, material_id: int, quantity: int, supplier: str, username: str = '') -> bool:
         """入库材料"""
         self.logger.info(f'开始材料入库: {material_id}, 数量: {quantity}, 用户: {username}')
         
@@ -404,7 +380,7 @@ class MaterialService:
             material = session.query(Material).filter(Material.id == material_id).first()
             if not material:
                 self.logger.warning(f'材料入库失败: 材料不存在 - {material_id}')
-                return {'success': False, 'message': '材料不存在'}
+                return False
             
             material.stock_count += quantity
             
@@ -419,23 +395,21 @@ class MaterialService:
             
             if self.db.commit_session(session):
                 self.logger.info(f'材料入库成功: {material_id}, 数量: {quantity}')
-                return {'success': True}
+                return True
             else:
-                self.logger.error(f'材料入库失败: 数据库提交失败 - {material_id}')
-                return {'success': False, 'message': '入库失败'}
+                self.logger.error(f'材料入库失败: 数据库更新失败 - {material_id}')
+                return False
                 
         except Exception as e:
             session.rollback()
             self.logger.error(f'材料入库异常: {material_id} - {str(e)}', exc_info=True)
-            return {'success': False, 'message': '入库失败'}
+            return False
         finally:
             self.db.close_session(session)
     
     def outbound(self, material_id: int, quantity: int, customer: str, username: str = '') -> dict:
         """出库操作"""
-        self.logger.info(f'开始材料出库: {material_id}, 数量: {quantity}, 用户: {username}')
         session = self.db.get_session()
-        
         try:
             material = session.query(Material).filter(Material.id == material_id).first()
             if not material:
@@ -443,9 +417,7 @@ class MaterialService:
             
             current_stock = material.stock_count
             if current_stock < quantity:
-                msg = f'库存不足，当前库存: {current_stock}'
-                self.logger.warning(f'材料出库失败: {msg}')
-                return {'success': False, 'message': msg}
+                return {'success': False, 'message': f'库存不足，当前库存: {current_stock}'}
             
             material.stock_count -= quantity
             
@@ -459,7 +431,6 @@ class MaterialService:
             session.add(operation)
             
             if self.db.commit_session(session):
-                self.logger.info(f'材料出库成功: {material_id}, 数量: {quantity}')
                 return {'success': True}
             else:
                 return {'success': False, 'message': '出库失败'}

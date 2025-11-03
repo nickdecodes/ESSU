@@ -11809,3 +11809,22 @@ ValueError: could not convert string to float: 'a2'
 2025-11-02 23:44:53,028 - main - INFO - API响应: GET /images/027a117c1dda4b02b5592c3094bfca2d.jpg - 状态码: 304
 2025-11-02 23:44:53,028 - main - INFO - API响应: GET /images/027a117c1dda4b02b5592c3094bfca2d.jpg - 状态码: 304
 2025-11-02 23:44:53,029 - werkzeug - INFO - 127.0.0.1 - - [02/Nov/2025 23:44:53] "[36mGET /images/027a117c1dda4b02b5592c3094bfca2d.jpg HTTP/1.1[0m" 304 -
+2025-11-03 20:10:28,994 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:17:13,344 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:19:37,047 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:20:55,401 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:22:31,932 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:23:15,393 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:23:39,466 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:23:48,629 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:24:29,681 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:24:58,431 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:27:19,618 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:27:32,161 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:27:39,000 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:28:28,141 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:29:16,131 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:34:56,548 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:35:47,972 - werkzeug - INFO -  * Restarting with stat
+2025-11-03 20:39:53,206 - main - INFO - Flask服务器关闭
+2025-11-03 20:39:53,206 - main - INFO - Flask服务器关闭
