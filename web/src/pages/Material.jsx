@@ -759,15 +759,16 @@ const Material = ({ user }) => {
       <div key={isMobile ? 'mobile-stats' : 'desktop-stats'} style={{ marginBottom: '16px' }}>
         {isMobile ? (
           <Card 
-            style={{ cursor: 'pointer' }} 
             styles={{ body: { padding: '8px 12px' } }}
-            onClick={() => {
-              const newValue = !statsCollapsed;
-              setStatsCollapsed(newValue);
-              localStorage.setItem('material_statsCollapsed', newValue);
-            }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div 
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => {
+                const newValue = !statsCollapsed;
+                setStatsCollapsed(newValue);
+                localStorage.setItem('material_statsCollapsed', newValue);
+              }}
+            >
               <span style={{ fontWeight: '600', fontSize: '13px' }}>数据概览</span>
               {statsCollapsed ? <DownOutlined style={{ fontSize: '10px' }} /> : <UpOutlined style={{ fontSize: '10px' }} />}
             </div>

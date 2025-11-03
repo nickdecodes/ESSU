@@ -1,5 +1,5 @@
 import { AppstoreOutlined, BarChartOutlined, DeleteOutlined, DownOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PictureOutlined, PlusOutlined, UndoOutlined, UpOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Flex, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Flex, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import { api } from '../utils/api';
@@ -42,51 +42,96 @@ const Product = ({ user }) => {
     const saved = localStorage.getItem('product_statsCollapsed');
     return saved === 'true';
   });
+  const [addLoading, setAddLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [batchDeleteLoading, setBatchDeleteLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [inLoading, setInLoading] = useState(false);
+  const [outLoading, setOutLoading] = useState(false);
+  const [restoreLoading, setRestoreLoading] = useState(false);
 
   const handleProductIn = async (values) => {
+    if (inLoading) return;
+    setInLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.productIn({ ...values, username: user.username });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         message.success('产品入库成功');
+        setInModalVisible(false);
         productInForm.resetFields();
+        setInLoading(false);
         loadProducts();
         loadMaterials();
       } else {
         message.error(response.data.message || '产品入库失败');
+        setInLoading(false);
       }
     } catch (error) {
       message.error('产品入库失败');
+      setInLoading(false);
     }
   };
 
   const handleProductOut = async (values) => {
+    if (outLoading) return;
+    setOutLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.productOut({ ...values, username: user.username });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         message.success(`产品出库成功，收益: ¥${response.data.revenue || 0}`);
+        setOutModalVisible(false);
         productOutForm.resetFields();
+        setOutLoading(false);
         loadProducts();
       } else {
         message.error(response.data.message || '产品出库失败');
+        setOutLoading(false);
       }
     } catch (error) {
       message.error('产品出库失败');
+      setOutLoading(false);
     }
   };
 
   const handleProductRestore = async (values) => {
+    if (restoreLoading) return;
+    setRestoreLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.productRestore({ ...values, username: user.username });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         message.success('产品还原成功');
+        setRestoreModalVisible(false);
         productRestoreForm.resetFields();
+        setRestoreLoading(false);
         loadProducts();
         loadMaterials();
       } else {
         message.error(response.data.message || '产品还原失败');
+        setRestoreLoading(false);
       }
     } catch (error) {
       message.error('产品还原失败');
+      setRestoreLoading(false);
     }
   };
 
@@ -120,16 +165,15 @@ const Product = ({ user }) => {
   };
 
   const handleUpdateProduct = async (values) => {
+    if (editLoading) return;
+    setEditLoading(true);
     try {
-      console.log('Updating product:', editingProduct.id);
-      console.log('Form values:', values);
-      
+      const startTime = Date.now();
       const materials = values.materials ? values.materials.reduce((acc, material) => {
         acc[material.product_id] = material.quantity;
         return acc;
       }, {}) : {};
       
-      // 先更新产品信息
       const updateData = {
         name: values.name,
         materials: materials,
@@ -139,11 +183,9 @@ const Product = ({ user }) => {
       const response = await api.updateProduct(editingProduct.id, updateData);
       
       if (response.data.success) {
-        // 检查是否有新上传的图片
         const hasNewImage = editProductFileList.length > 0 && editProductFileList[0].originFileObj;
         
         if (hasNewImage) {
-          // 先上传图片获取路径
           const formData = new FormData();
           formData.append('image', editProductFileList[0].originFileObj);
           
@@ -155,51 +197,79 @@ const Product = ({ user }) => {
           const imageResult = await imageResponse.json();
           
           if (imageResult.success) {
-            // 更新产品图片路径
             await api.updateProduct(editingProduct.id, {
               image_path: imageResult.image_path
             });
           }
         }
         
+        const elapsed = Date.now() - startTime;
+        const minDelay = Math.max(0, 500 - elapsed);
+        if (minDelay > 0) {
+          await new Promise(resolve => setTimeout(resolve, minDelay));
+        }
+        
         message.success('产品更新成功');
         setEditModalVisible(false);
         editForm.resetFields();
         setEditProductFileList([]);
+        setEditLoading(false);
         loadProducts();
       } else {
         message.error(response.data.message || '产品更新失败');
+        setEditLoading(false);
       }
     } catch (error) {
       console.error('Update product error:', error);
       message.error('产品更新失败');
+      setEditLoading(false);
     }
   };
 
   const handleDeleteProduct = async () => {
+    if (deleteLoading) return;
+    setDeleteLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.deleteProduct(deletingProduct.id, { username: user.username });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         message.success('产品删除成功');
         setDeleteModalVisible(false);
         setDeletingProduct(null);
+        setDeleteLoading(false);
         loadProducts();
       } else {
         message.error(response.data.message || '产品删除失败');
+        setDeleteLoading(false);
       }
     } catch (error) {
       message.error('产品删除失败');
+      setDeleteLoading(false);
     }
   };
 
   const handleBatchDelete = async () => {
+    if (batchDeleteLoading) return;
+    setBatchDeleteLoading(true);
     try {
+      const startTime = Date.now();
       const response = await api.batchDeleteProducts(selectedRowKeys, user.username);
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         const deletedCount = response.data.deleted_count || 0;
         message.success(response.data.message || `成功删除 ${deletedCount} 个产品`);
         setBatchDeleteModalVisible(false);
         setSelectedRowKeys([]);
+        setBatchDeleteLoading(false);
         loadProducts();
       } else {
         Modal.error({
@@ -247,11 +317,15 @@ const Product = ({ user }) => {
         if (response.data.should_close) {
           setBatchDeleteModalVisible(false);
           setSelectedRowKeys([]);
+          setBatchDeleteLoading(false);
           loadProducts();
+        } else {
+          setBatchDeleteLoading(false);
         }
       }
     } catch (error) {
       message.error('批量删除失败');
+      setBatchDeleteLoading(false);
     }
   };
 
@@ -322,7 +396,10 @@ const Product = ({ user }) => {
   };
 
   const addProduct = async (values) => {
+    if (addLoading) return;
+    setAddLoading(true);
     try {
+      const startTime = Date.now();
       const materials = {};
       values.materials?.forEach(m => {
         if (m.product_id && m.quantity) materials[m.product_id] = parseInt(m.quantity);
@@ -336,18 +413,28 @@ const Product = ({ user }) => {
       
       const response = await api.addProduct({ name: values.name, materials, manual_price: values.manual_price || 0, image_path: imagePath, username: user.username });
       
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success('产品添加成功');
+        setAddProductModalVisible(false);
         productForm.resetFields();
         productForm.setFieldsValue({ materials: [] });
         setProductFileList([]);
+        setAddLoading(false);
         loadProducts(message.error);
       } else {
         message.error(response.data.message || '产品添加失败');
+        setAddLoading(false);
       }
     } catch (error) {
       console.error('产品添加失败:', error);
       message.error('产品添加失败: ' + (error.response?.data?.message || error.message));
+      setAddLoading(false);
     }
   };
 
@@ -364,12 +451,19 @@ const Product = ({ user }) => {
     const file = e.target.files[0];
     if (!file) return;
     
+    setImportLoading(true);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('username', user.username);
     
     try {
+      const startTime = Date.now();
       const response = await api.importProducts(formData);
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
       if (response.data.success) {
         message.success(response.data.message || '导入成功');
         loadProducts();
@@ -379,25 +473,36 @@ const Product = ({ user }) => {
     } catch (error) {
       console.error('导入失败:', error);
       message.error('导入失败');
+    } finally {
+      setImportLoading(false);
+      e.target.value = '';
     }
-    e.target.value = '';
   };
 
-  const handleExport = () => {
-    const products = selectedRowKeys.length > 0 
-      ? selectedRowKeys 
-      : filteredProducts.map(p => p.id);
-    
-    if (products.length > 1000) {
-      Modal.warning({
-        title: '导出数量过多',
-        content: `当前选择了 ${products.length} 个产品，数据量过大。请使用筛选功能减少导出数量（建议不超过1000个）。`
-      });
-      return;
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      const products = selectedRowKeys.length > 0 
+        ? selectedRowKeys 
+        : filteredProducts.map(p => p.id);
+      
+      if (products.length > 1000) {
+        Modal.warning({
+          title: '导出数量过多',
+          content: `当前选择了 ${products.length} 个产品，数据量过大。请使用筛选功能减少导出数量（建议不超过1000个）。`
+        });
+        setExportLoading(false);
+        return;
+      }
+      
+      const startTime = Date.now();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const productIds = products.join(',');
+      window.open(`${Config.API_BASE_URL}/products/export?product_ids=${productIds}`, '_blank');
+    } finally {
+      setExportLoading(false);
     }
-    
-    const productIds = products.join(',');
-    window.open(`${Config.API_BASE_URL}/products/export?product_ids=${productIds}`, '_blank');
   };
 
   // 计算统计数据
@@ -564,18 +669,19 @@ const Product = ({ user }) => {
                   style={{ 
                     marginTop: '12px', 
                     paddingTop: '12px', 
-                    borderTop: '1px solid #d9d9d9',
-                    cursor: 'pointer'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const expandedKeys = expandedRowKeys.includes(product.id) 
-                      ? expandedRowKeys.filter(key => key !== product.id)
-                      : [...expandedRowKeys, product.id];
-                    setExpandedRowKeys(expandedKeys);
+                    borderTop: '1px solid #d9d9d9'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div 
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const expandedKeys = expandedRowKeys.includes(product.id) 
+                        ? expandedRowKeys.filter(key => key !== product.id)
+                        : [...expandedRowKeys, product.id];
+                      setExpandedRowKeys(expandedKeys);
+                    }}
+                  >
                     <span style={{ fontSize: '12px', fontWeight: '600' }}>材料清单</span>
                     {expandedRowKeys.includes(product.id) ? <UpOutlined style={{ fontSize: '10px' }} /> : <DownOutlined style={{ fontSize: '10px' }} />}
                   </div>
@@ -584,7 +690,7 @@ const Product = ({ user }) => {
                       {product.materials.map(material => {
                         const mat = products?.find(p => String(p.id) === String(material.product_id));
                         return (
-                          <div key={material.product_id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                          <div key={material.product_id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }} onClick={(e) => e.stopPropagation()}>
                             {mat?.image_path ? (
                               <img 
                                 src={`http://localhost:5274/${mat.image_path}`} 
@@ -599,7 +705,9 @@ const Product = ({ user }) => {
                                 <PictureOutlined style={{ color: '#ccc', fontSize: '10px' }} />
                               </div>
                             )}
-                            <span style={{ fontWeight: '500' }}>{material.name || mat?.name || material.product_id}:</span>
+                            <Tooltip title={(material.name || mat?.name || material.product_id)?.length > 10 ? (material.name || mat?.name || material.product_id) : null}>
+                              <span style={{ fontWeight: '500', maxWidth: '100px', display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{material.name || mat?.name || material.product_id}:</span>
+                            </Tooltip>
                             <span>需要 {material.required || 0} 个</span>
                             <span style={{ 
                               color: (material.stock || mat?.stock_count || 0) >= (material.required || 0) ? '#52c41a' : '#ff4d4f',
@@ -675,7 +783,9 @@ const Product = ({ user }) => {
                         <PictureOutlined style={{ color: '#ccc', fontSize: '12px' }} />
                       </div>
                     )}
-                    <span style={{ fontWeight: '500' }}>{material.name || product?.name || material.product_id}: </span>
+                    <Tooltip title={(material.name || product?.name || material.product_id)?.length > 15 ? (material.name || product?.name || material.product_id) : null}>
+                      <span style={{ fontWeight: '500', maxWidth: '150px', display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{material.name || product?.name || material.product_id}: </span>
+                    </Tooltip>
                     <span>需要 {material.required || 0} 个</span>
                     <span style={{ 
                       color: (material.stock || product?.stock_count || 0) >= (material.required || 0) ? '#52c41a' : '#ff4d4f',
@@ -787,7 +897,7 @@ const Product = ({ user }) => {
       width: isMobile ? 100 : 150,
       render: (text) => (
         <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center' }}>
-          <Tooltip title={text.length > (isMobile ? 8 : 12) ? text : null}>
+          <Tooltip title={text}>
             <span style={{ 
               fontWeight: '500', 
               fontSize: '14px',
@@ -1033,15 +1143,16 @@ const Product = ({ user }) => {
       <div key={isMobile ? 'mobile-stats' : 'desktop-stats'} style={{ marginBottom: '16px' }}>
         {isMobile ? (
           <Card 
-            style={{ cursor: 'pointer' }} 
             styles={{ body: { padding: '8px 12px' } }}
-            onClick={() => {
-              const newValue = !statsCollapsed;
-              setStatsCollapsed(newValue);
-              localStorage.setItem('product_statsCollapsed', newValue);
-            }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div 
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => {
+                const newValue = !statsCollapsed;
+                setStatsCollapsed(newValue);
+                localStorage.setItem('product_statsCollapsed', newValue);
+              }}
+            >
               <span style={{ fontWeight: '600', fontSize: '13px' }}>数据概览</span>
               {statsCollapsed ? <DownOutlined style={{ fontSize: '10px' }} /> : <UpOutlined style={{ fontSize: '10px' }} />}
             </div>
@@ -1227,6 +1338,8 @@ const Product = ({ user }) => {
                   <Button 
                     icon={<ImportOutlined />}
                     onClick={() => document.getElementById('product-import-input').click()}
+                    loading={importLoading}
+                    disabled={importLoading}
                     block
                   >
                     导入
@@ -1236,6 +1349,8 @@ const Product = ({ user }) => {
                   <Button 
                     icon={<ExportOutlined />}
                     onClick={handleExport}
+                    loading={exportLoading}
+                    disabled={exportLoading}
                     block
                   >
                     导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
@@ -1247,6 +1362,7 @@ const Product = ({ user }) => {
                     icon={<DeleteOutlined />}
                     onClick={() => setBatchDeleteModalVisible(true)}
                     disabled={selectedRowKeys.length === 0}
+                    loading={batchDeleteLoading}
                     block
                   >
                     删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
@@ -1361,12 +1477,16 @@ const Product = ({ user }) => {
                   <Button 
                     icon={<ImportOutlined />}
                     onClick={() => document.getElementById('product-import-input').click()}
+                    loading={importLoading}
+                    disabled={importLoading}
                   >
                     导入
                   </Button>
                   <Button 
                     icon={<ExportOutlined />}
                     onClick={handleExport}
+                    loading={exportLoading}
+                    disabled={exportLoading}
                   >
                     导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
                   </Button>
@@ -1375,6 +1495,7 @@ const Product = ({ user }) => {
                     icon={<DeleteOutlined />}
                     onClick={() => setBatchDeleteModalVisible(true)}
                     disabled={selectedRowKeys.length === 0}
+                    loading={batchDeleteLoading}
                   >
                     删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
                   </Button>
@@ -1400,9 +1521,9 @@ const Product = ({ user }) => {
         width={isMobile ? '95%' : 800}
         style={{ top: isMobile ? 20 : 100 }}
       >
+        <Spin spinning={addLoading} tip="添加中...">
         <Form form={productForm} layout="vertical" onFinish={(values) => {
           addProduct(values);
-          setAddProductModalVisible(false);
         }}>
           <Row gutter={24} align="top">
             <Col xs={24} md={16}>
@@ -1616,15 +1737,16 @@ const Product = ({ user }) => {
               <Button onClick={() => {
                 productForm.resetFields();
                 setProductFileList([]);
-              }}>
+              }} disabled={addLoading}>
                 清空
               </Button>
-              <Button type="primary" htmlType="submit" style={{ borderRadius: '6px' }}>
+              <Button type="primary" htmlType="submit" loading={addLoading} disabled={addLoading} style={{ borderRadius: '6px' }}>
                 添加
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1637,6 +1759,7 @@ const Product = ({ user }) => {
         footer={null}
         width={800}
       >
+        <Spin spinning={editLoading} tip="更新中...">
         <Form form={editForm} layout="vertical" onFinish={handleUpdateProduct}>
           <Row gutter={24}>
             <Col xs={24} md={16}>
@@ -1835,15 +1958,16 @@ const Product = ({ user }) => {
                 setEditModalVisible(false);
                 editForm.resetFields();
                 setEditProductFileList([]);
-              }}>
+              }} disabled={editLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={editLoading} disabled={editLoading}>
                 更新
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
 
       <Modal
@@ -1857,25 +1981,27 @@ const Product = ({ user }) => {
           <Button key="cancel" onClick={() => {
             setDeleteModalVisible(false);
             setDeletingProduct(null);
-          }}>
+          }} disabled={deleteLoading}>
             取消
           </Button>,
-          <Button key="delete" type="primary" danger onClick={handleDeleteProduct}>
+          <Button key="delete" type="primary" danger onClick={handleDeleteProduct} loading={deleteLoading} disabled={deleteLoading}>
             确定删除
           </Button>
         ]}
       >
+        <Spin spinning={deleteLoading} tip="删除中...">
         {deletingProduct && (
           <div>
             <p>确定要删除以下产品吗？</p>
-            <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '6px', margin: '12px 0' }}>
-              <div><strong>产品编号：</strong>{deletingProduct.id}</div>
-              <div><strong>产品名称：</strong>{deletingProduct.name}</div>
-              <div><strong>材料数量：</strong>{deletingProduct.materials?.length || 0} 种</div>
+            <div style={{ padding: '12px', borderRadius: '6px', margin: '12px 0' }}>
+              <div>产品编号：{deletingProduct.id}</div>
+              <div>产品名称：{deletingProduct.name}</div>
+              <div>材料数量：{deletingProduct.materials?.length || 0} 种</div>
             </div>
             <p style={{ color: '#ff4d4f', fontSize: '14px' }}>⚠️ 此操作不可撤销，请谨慎操作！</p>
           </div>
         )}
+        </Spin>
       </Modal>
       
       <Modal
@@ -1887,10 +2013,12 @@ const Product = ({ user }) => {
         }}
         okText="确定删除"
         cancelText="取消"
-        okButtonProps={{ danger: true }}
+        okButtonProps={{ danger: true, disabled: batchDeleteLoading }}
+        cancelButtonProps={{ disabled: batchDeleteLoading }}
       >
+        <Spin spinning={batchDeleteLoading} tip="删除中...">
         <p>确定要删除以下 {selectedRowKeys.length} 个产品吗？</p>
-        <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '6px', margin: '12px 0', maxHeight: '200px', overflow: 'auto' }}>
+        <div style={{ padding: '12px', borderRadius: '6px', margin: '12px 0', maxHeight: '200px', overflow: 'auto' }}>
           {selectedRowKeys.map(productId => {
             const product = (productList || []).find(f => f.id === productId);
             return product ? (
@@ -1915,7 +2043,7 @@ const Product = ({ user }) => {
                     <PictureOutlined style={{ color: '#999', fontSize: '12px' }} />
                   </div>
                 )}
-                <strong>{product.name}</strong>
+                <span>{product.name}</span>
                 <span style={{ 
                   fontSize: '12px', 
                   color: (product.stock_count || 0) > 0 ? '#ff4d4f' : '#52c41a',
@@ -1928,6 +2056,7 @@ const Product = ({ user }) => {
           })}
         </div>
         <p style={{ color: '#ff4d4f', fontSize: '14px' }}>⚠️ 只有库存数量为0的产品才能删除，此操作不可撤销！</p>
+        </Spin>
       </Modal>
       
       <Modal
@@ -1950,9 +2079,9 @@ const Product = ({ user }) => {
         footer={null}
         width={400}
       >
+        <Spin spinning={inLoading} tip="入库中...">
         <Form form={productInForm} layout="vertical" onFinish={(values) => {
           handleProductIn({ ...values, formula_id: selectedProduct.id });
-          setInModalVisible(false);
         }}>
           <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, border: '1px solid #d9d9d9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1968,7 +2097,7 @@ const Product = ({ user }) => {
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <Tooltip title={selectedProduct?.name?.length > 15 ? selectedProduct?.name : null}>
+                <Tooltip title={selectedProduct?.name}>
                   <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedProduct?.name}</div>
                 </Tooltip>
                 <div style={{ fontSize: 12 }}>可制作：{selectedProduct?.possible_quantity} | 库存：{selectedProduct?.stock_count || 0}</div>
@@ -1996,15 +2125,16 @@ const Product = ({ user }) => {
               <Button onClick={() => {
                 setInModalVisible(false);
                 productInForm.resetFields();
-              }}>
+              }} disabled={inLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={inLoading} disabled={inLoading}>
                 入库
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
 
       <Modal
@@ -2017,9 +2147,9 @@ const Product = ({ user }) => {
         footer={null}
         width={400}
       >
+        <Spin spinning={outLoading} tip="出库中...">
         <Form form={productOutForm} layout="vertical" onFinish={(values) => {
           handleProductOut({ ...values, formula_id: selectedProduct.id });
-          setOutModalVisible(false);
         }}>
           <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, border: '1px solid #d9d9d9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2035,7 +2165,7 @@ const Product = ({ user }) => {
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <Tooltip title={selectedProduct?.name?.length > 15 ? selectedProduct?.name : null}>
+                <Tooltip title={selectedProduct?.name}>
                   <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedProduct?.name}</div>
                 </Tooltip>
                 <div style={{ fontSize: 12 }}>库存：{selectedProduct?.stock_count || 0}</div>
@@ -2080,15 +2210,16 @@ const Product = ({ user }) => {
               <Button onClick={() => {
                 setOutModalVisible(false);
                 productOutForm.resetFields();
-              }}>
+              }} disabled={outLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={outLoading} disabled={outLoading}>
                 出库
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
 
       <Modal
@@ -2101,9 +2232,9 @@ const Product = ({ user }) => {
         footer={null}
         width={400}
       >
+        <Spin spinning={restoreLoading} tip="还原中...">
         <Form form={productRestoreForm} layout="vertical" onFinish={(values) => {
           handleProductRestore({ ...values, formula_id: selectedProduct.id });
-          setRestoreModalVisible(false);
         }}>
           <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, border: '1px solid #d9d9d9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2119,7 +2250,7 @@ const Product = ({ user }) => {
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <Tooltip title={selectedProduct?.name?.length > 15 ? selectedProduct?.name : null}>
+                <Tooltip title={selectedProduct?.name}>
                   <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedProduct?.name}</div>
                 </Tooltip>
                 <div style={{ fontSize: 12 }}>库存：{selectedProduct?.stock_count || 0}</div>
@@ -2147,15 +2278,16 @@ const Product = ({ user }) => {
               <Button onClick={() => {
                 setRestoreModalVisible(false);
                 productRestoreForm.resetFields();
-              }}>
+              }} disabled={restoreLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={restoreLoading} disabled={restoreLoading}>
                 还原
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
     </>
   );

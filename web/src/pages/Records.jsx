@@ -1,5 +1,5 @@
 import { ExportOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Input, Modal, Row, Select, Space, Table, Tag, Tooltip } from 'antd';
+import { Button, Card, Col, DatePicker, Input, Modal, Row, Select, Space, Spin, Table, Tag, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../utils/api';
@@ -25,6 +25,8 @@ const Records = () => {
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' for descending, 'asc' for ascending
   const [deleteAfterExport, setDeleteAfterExport] = useState(false);
   const [debouncedSearchText, setDebouncedSearchText] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
 
   const loadRecords = async (params = {}) => {
@@ -97,27 +99,49 @@ const Records = () => {
     setDateRange(range);
   }, []);
 
-  const handleSearch = () => {
-    loadRecords({ 
-      search: debouncedSearchText, 
-      dateRange, 
-      operationType: operationTypeFilter, 
-      username: usernameFilter, 
-      sortOrder
-    });
-    setModalVisible(false);
+  const handleSearch = async () => {
+    setSearchLoading(true);
+    try {
+      const startTime = Date.now();
+      await loadRecords({ 
+        search: debouncedSearchText, 
+        dateRange, 
+        operationType: operationTypeFilter, 
+        username: usernameFilter, 
+        sortOrder
+      });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+    } finally {
+      setSearchLoading(false);
+      setModalVisible(false);
+    }
   };
 
-  const handleExport = () => {
-    api.exportRecords({
-      search: debouncedSearchText,
-      dateRange,
-      operationType: operationTypeFilter,
-      username: usernameFilter,
-      sortOrder,
-      deleteAfterExport
-    });
-    setModalVisible(false);
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      const startTime = Date.now();
+      await api.exportRecords({
+        search: debouncedSearchText,
+        dateRange,
+        operationType: operationTypeFilter,
+        username: usernameFilter,
+        sortOrder,
+        deleteAfterExport
+      });
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+    } finally {
+      setExportLoading(false);
+      setModalVisible(false);
+    }
   };
 
   const openModal = (type) => {
@@ -147,22 +171,22 @@ const Records = () => {
   const renderSearchBar = () => isMobile ? (
     <Row gutter={[16, 16]}>
       <Col span={12}>
-        <Button type="primary" icon={<SearchOutlined />} onClick={() => openModal('search')} block>
+        <Button type="primary" icon={<SearchOutlined />} onClick={() => openModal('search')} loading={searchLoading} disabled={searchLoading} block>
           搜索
         </Button>
       </Col>
       <Col span={12}>
-        <Button icon={<ExportOutlined />} onClick={() => openModal('export')} block>
+        <Button icon={<ExportOutlined />} onClick={() => openModal('export')} loading={exportLoading} disabled={exportLoading} block>
           导出
         </Button>
       </Col>
     </Row>
   ) : (
     <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-      <Button type="primary" icon={<SearchOutlined />} onClick={() => openModal('search')}>
+      <Button type="primary" icon={<SearchOutlined />} onClick={() => openModal('search')} loading={searchLoading} disabled={searchLoading}>
         搜索
       </Button>
-      <Button icon={<ExportOutlined />} onClick={() => openModal('export')}>
+      <Button icon={<ExportOutlined />} onClick={() => openModal('export')} loading={exportLoading} disabled={exportLoading}>
         导出
       </Button>
     </Space>
@@ -321,16 +345,18 @@ const Records = () => {
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setModalVisible(false)}>
+          <Button key="cancel" onClick={() => setModalVisible(false)} disabled={searchLoading || exportLoading}>
             取消
           </Button>,
-          <Button key="clear" onClick={clearAllFilters}>
+          <Button key="clear" onClick={clearAllFilters} disabled={searchLoading || exportLoading}>
             清空筛选
           </Button>,
           <Button 
             key="confirm" 
             type="primary" 
             onClick={modalType === 'search' ? handleSearch : handleExport}
+            loading={modalType === 'search' ? searchLoading : exportLoading}
+            disabled={modalType === 'search' ? searchLoading : exportLoading}
           >
             {modalType === 'search' ? '确定搜索' : '导出Excel'}
           </Button>
@@ -338,6 +364,7 @@ const Records = () => {
         width={isMobile ? '95%' : 600}
         style={{ top: isMobile ? 20 : 100 }}
       >
+        <Spin spinning={searchLoading || exportLoading} tip={modalType === 'search' ? '搜索中...' : '导出中...'}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Input
             placeholder="搜索操作详情"
@@ -425,6 +452,7 @@ const Records = () => {
             </div>
           )}
         </Space>
+        </Spin>
       </Modal>
 
     </Space>

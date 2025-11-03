@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, ExportOutlined, ImportOutlined, UserAddOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Form, Input, List, Modal, Row, Select, Space, Table, Tag, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Form, Input, List, Modal, Row, Select, Space, Spin, Table, Tag, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import UserAvatar from '../components/UserAvatar';
@@ -34,6 +34,10 @@ const User = ({ user }) => {
   const [modalAvatarFileList, setModalAvatarFileList] = useState([]);
   const [devicesModalVisible, setDevicesModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(false);
+  const [batchDeleteLoading, setBatchDeleteLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const handleViewDevices = (user) => {
     setSelectedUser(user);
     setDevicesModalVisible(true);
@@ -98,22 +102,34 @@ const User = ({ user }) => {
   };
 
   const addUser = async (values) => {
+    if (userLoading) return;
+    setUserLoading(true);
     try {
+      const startTime = Date.now();
       const hasAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
       const response = hasAvatar
         ? await uploadFormData('/users', {...values, operator: user.username}, modalAvatarFileList[0].originFileObj, 'avatar')
         : await api.addUser({...values, operator: user.username});
       
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success('用户添加成功');
-        setModalAvatarFileList([]);
+        closeUserModal();
+        setUserLoading(false);
         loadUsers(message.error);
       } else {
         message.error(response.data.message || '用户添加失败');
+        setUserLoading(false);
       }
     } catch (error) {
       console.error('用户添加失败:', error);
       message.error('用户添加失败');
+      setUserLoading(false);
     }
   };
 
@@ -133,7 +149,10 @@ const User = ({ user }) => {
   };
 
   const handleSubmitUser = async (values) => {
+    if (userLoading) return;
+    setUserLoading(true);
     try {
+      const startTime = Date.now();
       if (editingUser) {
         const hasAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
         const additionalData = { username: values.username, role: values.role, operator: user.username };
@@ -148,33 +167,54 @@ const User = ({ user }) => {
         
         if (!response.data.success) {
           message.error(response.data.message || '用户更新失败');
+          setUserLoading(false);
           return;
         }
         message.success('用户更新成功');
         
+        const elapsed = Date.now() - startTime;
+        const minDelay = Math.max(0, 500 - elapsed);
+        if (minDelay > 0) {
+          await new Promise(resolve => setTimeout(resolve, minDelay));
+        }
+        
         if (editingUser.username === user.username || values.username === user.username) {
           await updateCurrentUserSession();
         }
+        
+        closeUserModal();
+        setUserLoading(false);
+        loadUsers();
       } else {
         await addUser(values);
       }
-      closeUserModal();
-      loadUsers();
     } catch (error) {
       message.error(error.response?.data?.message || '操作失败');
+      setUserLoading(false);
     }
   };
 
   const handleBatchDelete = async () => {
+    if (batchDeleteLoading) return;
+    setBatchDeleteLoading(true);
     try {
+      const startTime = Date.now();
       const usernamesToDelete = selectedRowKeys.map(id => users.find(u => u.id === id)?.username).filter(Boolean);
       await Promise.all(usernamesToDelete.map(username => api.deleteUser(username, { operator: user.username })));
+      
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       message.success(`成功删除 ${selectedRowKeys.length} 个用户`);
     } catch (error) {
       message.error(error.response?.data?.message || '批量删除失败');
     } finally {
       setBatchDeleteModalVisible(false);
       setSelectedRowKeys([]);
+      setBatchDeleteLoading(false);
       loadUsers();
     }
   };
@@ -278,12 +318,21 @@ const User = ({ user }) => {
     const file = e.target.files[0];
     if (!file) return;
     
+    setImportLoading(true);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('operator', user.username);
     
     try {
+      const startTime = Date.now();
       const response = await api.importUsers(formData);
+      
+      const elapsed = Date.now() - startTime;
+      const minDelay = Math.max(0, 500 - elapsed);
+      if (minDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+      }
+      
       if (response.data.success) {
         message.success(response.data.message || '导入成功');
         loadUsers();
@@ -293,15 +342,25 @@ const User = ({ user }) => {
     } catch (error) {
       console.error('导入失败:', error);
       message.error('导入失败');
+    } finally {
+      setImportLoading(false);
+      e.target.value = '';
     }
-    e.target.value = '';
   };
 
-  const handleExport = () => {
-    const userIds = selectedRowKeys.length > 0 
-      ? selectedRowKeys.join(',') 
-      : filteredUsers.map(u => u.id).join(',');
-    api.exportUsers(userIds);
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      const startTime = Date.now();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const userIds = selectedRowKeys.length > 0 
+        ? selectedRowKeys.join(',') 
+        : filteredUsers.map(u => u.id).join(',');
+      api.exportUsers(userIds);
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   const renderMobileSearchBar = () => (
@@ -328,17 +387,17 @@ const User = ({ user }) => {
         </Button>
       </Col>
       <Col span={12}>
-        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()} block>
+        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()} loading={importLoading} disabled={importLoading} block>
           导入
         </Button>
       </Col>
       <Col span={12}>
-        <Button icon={<ExportOutlined />} onClick={handleExport} block>
+        <Button icon={<ExportOutlined />} onClick={handleExport} loading={exportLoading} disabled={exportLoading} block>
           导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
         </Button>
       </Col>
       <Col span={12}>
-        <Button icon={<DeleteOutlined />} onClick={() => setBatchDeleteModalVisible(true)} disabled={selectedRowKeys.length === 0} danger block>
+        <Button icon={<DeleteOutlined />} onClick={() => setBatchDeleteModalVisible(true)} disabled={selectedRowKeys.length === 0} loading={batchDeleteLoading} danger block>
           删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
         </Button>
       </Col>
@@ -365,13 +424,13 @@ const User = ({ user }) => {
         <Button type="primary" icon={<UserAddOutlined />} onClick={() => openUserModal()}>
           添加
         </Button>
-        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()}>
+        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()} loading={importLoading} disabled={importLoading}>
           导入
         </Button>
-        <Button icon={<ExportOutlined />} onClick={handleExport}>
+        <Button icon={<ExportOutlined />} onClick={handleExport} loading={exportLoading} disabled={exportLoading}>
           导出{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
         </Button>
-        <Button icon={<DeleteOutlined />} onClick={() => setBatchDeleteModalVisible(true)} disabled={selectedRowKeys.length === 0} danger>
+        <Button icon={<DeleteOutlined />} onClick={() => setBatchDeleteModalVisible(true)} disabled={selectedRowKeys.length === 0} loading={batchDeleteLoading} danger>
           删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
         </Button>
       </Space>
@@ -532,6 +591,7 @@ const User = ({ user }) => {
         footer={null}
         width={isMobile ? '95%' : 600}
       >
+        <Spin spinning={userLoading} tip={editingUser ? '更新中...' : '添加中...'}>
         <Form form={modalForm} layout="vertical" onFinish={handleSubmitUser}>
           <Form.Item 
             name="username" 
@@ -580,15 +640,16 @@ const User = ({ user }) => {
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button onClick={closeUserModal}>
+              <Button onClick={closeUserModal} disabled={userLoading}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={userLoading} disabled={userLoading}>
                 {editingUser ? '保存' : '添加'}
               </Button>
             </Space>
           </Form.Item>
         </Form>
+        </Spin>
       </Modal>
       
       <Modal
@@ -598,8 +659,10 @@ const User = ({ user }) => {
         onCancel={() => setBatchDeleteModalVisible(false)}
         okText="删除"
         cancelText="取消"
-        okButtonProps={{ danger: true }}
+        okButtonProps={{ danger: true, disabled: batchDeleteLoading }}
+        cancelButtonProps={{ disabled: batchDeleteLoading }}
       >
+        <Spin spinning={batchDeleteLoading} tip="删除中...">
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Text>确定要删除以下 {selectedRowKeys.length} 个用户吗？</Typography.Text>
           <Space direction="vertical" size="middle" style={{ maxHeight: '200px', overflow: 'auto', width: '100%' }}>
@@ -614,6 +677,7 @@ const User = ({ user }) => {
           </Space>
           <Typography.Text type="danger">⚠️ 此操作不可撤销，请谨慎操作！</Typography.Text>
         </Space>
+        </Spin>
       </Modal>
       
       <Modal
