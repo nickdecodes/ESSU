@@ -209,3 +209,8 @@ __marimo__/
 # Web
 node_modules/
 web/node_modules/
+
+# server
+server/logs/
+server/uploads/
+server/exports/

@@ -11,18 +11,23 @@ const Records = () => {
   const [records, setRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(() => localStorage.getItem('records_searchText') || '');
   const [dateRange, setDateRange] = useState(() => {
+    const saved = localStorage.getItem('records_dateRange');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.map(date => dayjs(date));
+    }
     const today = dayjs();
     return [today.startOf('week'), today.endOf('week')];
   });
-  const [operationTypeFilter, setOperationTypeFilter] = useState([]);
-  const [usernameFilter, setUsernameFilter] = useState([]);
+  const [operationTypeFilter, setOperationTypeFilter] = useState(() => JSON.parse(localStorage.getItem('records_operationTypeFilter') || '[]'));
+  const [usernameFilter, setUsernameFilter] = useState(() => JSON.parse(localStorage.getItem('records_usernameFilter') || '[]'));
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('search'); // 'search' or 'export'
   const { isMobile } = useResponsive();
-  const [sortOrder, setSortOrder] = useState('desc'); // 'desc' for descending, 'asc' for ascending
+  const [sortOrder, setSortOrder] = useState(() => localStorage.getItem('records_sortOrder') || 'desc');
   const [deleteAfterExport, setDeleteAfterExport] = useState(false);
   const [debouncedSearchText, setDebouncedSearchText] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
@@ -33,12 +38,11 @@ const Records = () => {
     setLoading(true);
     try {
       const requestParams = {
-        page_size: 10000,
-        search: params.search || searchText,
-        dateRange: params.dateRange || dateRange,
-        operationType: params.operationType,
-        username: params.username,
-        sortOrder: params.sortOrder || sortOrder
+        search: params.search !== undefined ? params.search : searchText,
+        dateRange: params.dateRange !== undefined ? params.dateRange : dateRange,
+        operationType: params.operationType !== undefined ? params.operationType : operationTypeFilter,
+        username: params.username !== undefined ? params.username : usernameFilter,
+        sortOrder: params.sortOrder !== undefined ? params.sortOrder : sortOrder
       };
       
       const response = await api.getRecords(requestParams);
@@ -104,7 +108,7 @@ const Records = () => {
     try {
       const startTime = Date.now();
       await loadRecords({ 
-        search: debouncedSearchText, 
+        search: searchText, 
         dateRange, 
         operationType: operationTypeFilter, 
         username: usernameFilter, 
@@ -126,7 +130,7 @@ const Records = () => {
     try {
       const startTime = Date.now();
       await api.exportRecords({
-        search: debouncedSearchText,
+        search: searchText,
         dateRange,
         operationType: operationTypeFilter,
         username: usernameFilter,
@@ -159,6 +163,12 @@ const Records = () => {
     setUsernameFilter([]);
     setSortOrder('desc');
     setDeleteAfterExport(false);
+    // 清除localStorage
+    localStorage.removeItem('records_searchText');
+    localStorage.removeItem('records_dateRange');
+    localStorage.removeItem('records_operationTypeFilter');
+    localStorage.removeItem('records_usernameFilter');
+    localStorage.removeItem('records_sortOrder');
     loadRecords({ search: '', dateRange: [], operationType: [], username: [], sortOrder: 'desc' });
   };
 
@@ -202,6 +212,8 @@ const Records = () => {
       if (type.includes('还原')) return 'orange';
       if (type.includes('添加')) return 'cyan';
       if (type.includes('编辑') || type.includes('更新')) return 'blue';
+
+      if (type.includes('导出')) return 'geekblue';
       if (type.includes('删除')) return 'red';
       return 'default';
     };
@@ -290,6 +302,8 @@ const Records = () => {
         else if (type.includes('还原')) color = 'orange';
         else if (type.includes('添加')) color = 'cyan';
         else if (type.includes('编辑') || type.includes('更新')) color = 'blue';
+
+        else if (type.includes('导出')) color = 'geekblue';
         else if (type.includes('删除')) color = 'red';
         return <Tag color={color}>{type}</Tag>;
       }
@@ -370,7 +384,10 @@ const Records = () => {
             placeholder="搜索操作详情"
             allowClear
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              localStorage.setItem('records_searchText', e.target.value);
+            }}
             onPressEnter={handleSearch}
             style={{ width: '100%' }}
             prefix={<SearchOutlined />}
@@ -380,7 +397,10 @@ const Records = () => {
             allowClear
             mode="multiple"
             value={operationTypeFilter}
-            onChange={setOperationTypeFilter}
+            onChange={(value) => {
+              setOperationTypeFilter(value);
+              localStorage.setItem('records_operationTypeFilter', JSON.stringify(value));
+            }}
             style={{ width: '100%' }}
             options={[
               { label: '用户登录', value: '用户登录' },
@@ -388,27 +408,36 @@ const Records = () => {
               { label: '材料入库', value: '材料入库' },
               { label: '材料出库', value: '材料出库' },
               { label: '添加材料', value: '添加材料' },
-              { label: '编辑材料', value: '编辑材料' },
+              { label: '更新材料', value: '更新材料' },
               { label: '删除材料', value: '删除材料' },
+              { label: '导出材料', value: '导出材料' },
               { label: '产品入库', value: '产品入库' },
               { label: '产品出库', value: '产品出库' },
               { label: '产品还原', value: '产品还原' },
               { label: '添加产品', value: '添加产品' },
-              { label: '编辑产品', value: '编辑产品' },
+              { label: '更新产品', value: '更新产品' },
               { label: '删除产品', value: '删除产品' },
+              { label: '导出产品', value: '导出产品' },
               { label: '添加用户', value: '添加用户' },
               { label: '编辑用户', value: '编辑用户' },
-              { label: '删除用户', value: '删除用户' }
+              { label: '删除用户', value: '删除用户' },
+              { label: '导出用户', value: '导出用户' },
+              { label: '移除设备', value: '移除设备' }
             ]}
           />
           <Select
-            placeholder="选择操作用户"
+            placeholder="输入或选择操作用户"
             allowClear
-            mode="multiple"
+            mode="tags"
             value={usernameFilter}
-            onChange={setUsernameFilter}
+            onChange={(value) => {
+              setUsernameFilter(value);
+              localStorage.setItem('records_usernameFilter', JSON.stringify(value));
+            }}
             style={{ width: '100%' }}
             options={uniqueUsers}
+            showSearch
+            filterOption={false}
           />
           <div>
             <div style={{ marginBottom: '8px', fontSize: '12px', color: '#666' }}>快捷选择：</div>
@@ -422,7 +451,10 @@ const Records = () => {
             <RangePicker
               placeholder={['开始日期', '结束日期']}
               value={dateRange}
-              onChange={setDateRange}
+              onChange={(value) => {
+                setDateRange(value);
+                localStorage.setItem('records_dateRange', JSON.stringify(value ? value.map(d => d.format('YYYY-MM-DD')) : []));
+              }}
               style={{ width: '100%' }}
               format="YYYY-MM-DD"
               allowClear
@@ -431,7 +463,10 @@ const Records = () => {
           <Select
             placeholder="时间排序"
             value={sortOrder}
-            onChange={setSortOrder}
+            onChange={(value) => {
+              setSortOrder(value);
+              localStorage.setItem('records_sortOrder', value);
+            }}
             style={{ width: '100%' }}
             options={[
               { label: '时间倒序（最新在前）', value: 'desc' },

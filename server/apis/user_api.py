@@ -73,12 +73,18 @@ def _get_user_data_from_request():
         }
     else:
         data = request.json or {}
+        avatar_path = None
+        if data.get('avatar_url'):
+            avatar_path = data.get('avatar_url')
+        elif data.get('avatar_path'):
+            avatar_path = data.get('avatar_path')
+        
         return {
             'username': data.get('username', '').strip() if data.get('username') else None,
             'password': data.get('password', '').strip() if data.get('password') else None,
             'role': data.get('role', '').strip() if data.get('role') else None,
             'operator': data.get('operator', ''),
-            'avatar_path': data.get('avatar_path')
+            'avatar_path': avatar_path
         }
 
 
@@ -198,5 +204,12 @@ def import_users():
 def export_users():
     """导出用户"""
     user_ids = request.args.get('user_ids', '')
+    operator = request.args.get('operator', '')
     user_id_list = [int(uid) for uid in user_ids.split(',') if uid] if user_ids else []
-    return user_service.export_to_excel(user_id_list)
+    return user_service.export_to_excel(user_id_list, operator)
+
+
+@user_bp.route('/users/import-template')
+def download_import_template():
+    """下载用户导入模板"""
+    return user_service.generate_import_template()

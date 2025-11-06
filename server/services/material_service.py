@@ -33,7 +33,7 @@ class MaterialService:
         finally:
             self.db.close_session(session)
     
-    def add_material(self, name: str, in_price: float, out_price: float = None, username: str = '', image_path: str = None) -> dict:
+    def add_material(self, name: str, in_price: float, out_price: float = None, username: str = '', image_path: str = None, detail: str = None, stock_count: int = 0) -> dict:
         """添加材料"""
         if out_price is None:
             out_price = in_price
@@ -46,7 +46,8 @@ class MaterialService:
                 name=name,
                 in_price=in_price,
                 out_price=out_price,
-                image_path=image_path
+                image_path=image_path,
+                stock_count=stock_count
             )
             
             session.add(material)
@@ -56,7 +57,7 @@ class MaterialService:
                 operation_type='添加材料',
                 name=name,
                 quantity=0,
-                detail=f'添加材料: {name}',
+                detail=detail or f'添加材料: {name}',
                 username=username
             )
             session.add(operation)
@@ -204,16 +205,16 @@ class MaterialService:
             
             if deleted_count > 0:
                 operation = OperationRecord(
-                    operation_type='批量删除材料',
-                    name=f'批量删除{deleted_count}个材料',
+                    operation_type='删除材料',
+                    name=f'删除{deleted_count}个材料',
                     quantity=deleted_count,
-                    detail=f'批量删除材料ID: {material_ids}',
+                    detail=f'删除材料ID: {material_ids}',
                     username=username
                 )
                 session.add(operation)
             
             if self.db.commit_session(session):
-                self.logger.info(f'批量删除成功: {deleted_count}个材料')
+                self.logger.info(f'删除成功: {deleted_count}个材料')
                 if failed_materials:
                     return {
                         'success': False,
@@ -223,12 +224,12 @@ class MaterialService:
                     }
                 return {'success': True, 'message': f'成功删除 {deleted_count} 个材料'}
             else:
-                return {'success': False, 'message': '批量删除失败'}
+                return {'success': False, 'message': '删除失败'}
                 
         except Exception as e:
             session.rollback()
-            self.logger.error(f'批量删除材料异常: {str(e)}', exc_info=True)
-            return {'success': False, 'message': '批量删除失败'}
+            self.logger.error(f'删除材料异常: {str(e)}', exc_info=True)
+            return {'success': False, 'message': '删除失败'}
         finally:
             self.db.close_session(session)
     
@@ -277,9 +278,9 @@ class MaterialService:
                                     new_cost += (mat.in_price or 0) * required_qty
                                     new_selling += (mat.out_price or 0) * required_qty
                         
-                        manual_price = product.manual_price or 0
-                        current_selling += manual_price
-                        new_selling += manual_price
+                        other_price = product.other_price or 0
+                        current_selling += other_price
+                        new_selling += other_price
                         
                         material_list = []
                         for mat_id, qty in materials.items():
@@ -312,7 +313,7 @@ class MaterialService:
         finally:
             self.db.close_session(session)
     
-    def update_material(self, material_id: int, name: str, in_price: float = None, out_price: float = None, username: str = '', image_path: str = None) -> dict:
+    def update_material(self, material_id: int, name: str, in_price: float = None, out_price: float = None, username: str = '', image_path: str = None, detail: str = None, stock_count: int = None) -> dict:
         """更新材料信息"""
         self.logger.info(f'开始更新材料: {material_id}, 用户: {username}')
         session = self.db.get_session()
@@ -336,6 +337,8 @@ class MaterialService:
                 material.out_price = out_price
             if image_path is not None:
                 material.image_path = image_path
+            if stock_count is not None:
+                material.stock_count = stock_count
             
             if price_changed:
                 self._update_related_products_price(session, material_id)
@@ -344,7 +347,7 @@ class MaterialService:
                 operation_type='更新材料',
                 name=name,
                 quantity=0,
-                detail=f'更新材料: {name}',
+                detail=detail or f'更新材料: {name}',
                 username=username
             )
             session.add(operation)
@@ -384,7 +387,7 @@ class MaterialService:
                                 total_in_price += (material.in_price or 0) * required_qty
                         
                         product.in_price = total_in_price
-                        product.out_price = total_in_price + (product.manual_price or 0)
+                        product.out_price = total_in_price + (product.other_price or 0)
                         
                         self.logger.debug(f'更新产品价格: {product.name} - 成本: {total_in_price}, 售价: {product.out_price}')
                         
@@ -491,7 +494,8 @@ class MaterialService:
             ws = wb.active
             self.logger.info(f'Excel读取成功, 工作表: {ws.title}')
             
-            success_count = 0
+            created_count = 0
+            updated_count = 0
             failed_count = 0
             
             for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
@@ -510,70 +514,68 @@ class MaterialService:
                     name = str(row[name_idx]).strip()
                     in_price = float(row[price_in_idx]) if row[price_in_idx] else 0
                     out_price = float(row[price_out_idx]) if row[price_out_idx] else in_price
-                    stock_count = int(row[stock_idx]) if stock_idx < len(row) and row[stock_idx] else 0
+                    import_stock = int(row[stock_idx]) if stock_idx < len(row) and row[stock_idx] else 0
                     
                     session = self.db.get_session()
                     existing = session.query(Material).filter(Material.name == name).first()
+                    self.db.close_session(session)
                     
                     if existing:
-                        existing.in_price = in_price
-                        existing.out_price = out_price
-                        existing.stock_count = stock_count
+                        # 检查价格是否匹配
+                        if existing.in_price != in_price:
+                            self.logger.error(f'第{row_num}行导入失败: {name} 进价不匹配，数据库: {existing.in_price}, 导入: {in_price}')
+                            failed_count += 1
+                            continue
+                        if existing.out_price != out_price:
+                            self.logger.error(f'第{row_num}行导入失败: {name} 售价不匹配，数据库: {existing.out_price}, 导入: {out_price}')
+                            failed_count += 1
+                            continue
                         
-                        operation = OperationRecord(
-                            operation_type='导入材料',
-                            name=name,
-                            quantity=stock_count,
-                            detail=f'导入材料: {name}, 库存: {stock_count}',
-                            username=username
+                        # 库存自增
+                        new_stock = existing.stock_count + import_stock
+                        detail = f'导入材料: {name}, 增加库存: +{import_stock}'
+                        
+                        result = self.update_material(
+                            existing.id, name, in_price, out_price, username, 
+                            None, detail, new_stock
                         )
-                        session.add(operation)
-                        
-                        if self.db.commit_session(session):
-                            success_count += 1
+                        if result.get('success'):
+                            updated_count += 1
                         else:
                             failed_count += 1
                     else:
-                        material = Material(
-                            name=name,
-                            in_price=in_price,
-                            out_price=out_price,
-                            stock_count=stock_count
+                        detail = f'导入材料: {name}, 初始库存: {import_stock}'
+                        result = self.add_material(
+                            name, in_price, out_price, username, 
+                            None, detail, import_stock
                         )
-                        session.add(material)
-                        session.flush()
-                        
-                        operation = OperationRecord(
-                            operation_type='导入材料',
-                            name=name,
-                            quantity=stock_count,
-                            detail=f'导入材料: {name}, 库存: {stock_count}',
-                            username=username
-                        )
-                        session.add(operation)
-                        
-                        if self.db.commit_session(session):
-                            success_count += 1
+                        if result.get('success'):
+                            created_count += 1
                         else:
                             failed_count += 1
-                    
-                    self.db.close_session(session)
+                            
                 except Exception as e:
-                    session.rollback()
-                    self.db.close_session(session)
                     self.logger.error(f'第{row_num}行导入失败: {str(e)}', exc_info=True)
                     failed_count += 1
             
+            total_count = created_count + updated_count + failed_count
+            success_count = created_count + updated_count
             msg = f'导入完成，成功 {success_count} 个，失败 {failed_count} 个'
             self.logger.info(msg)
-            return {'success': True, 'message': msg}
+            return {
+                'success': True, 
+                'message': msg,
+                'total_count': total_count,
+                'created_count': created_count,
+                'updated_count': updated_count
+            }
             
         except Exception as e:
             msg = f'导入Excel失败: {str(e)}'
             self.logger.error(msg, exc_info=True)
             return {'success': False, 'message': msg}
     
-    def export_to_excel(self, material_ids: list = None):
+    def export_to_excel(self, material_ids: list = None, username: str = ''):
         """导出材料到Excel"""
         import openpyxl
         from flask import send_file
@@ -654,6 +656,23 @@ class MaterialService:
             
             filename = f'materials_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
             
+            # 记录导出操作
+            if username:
+                session = self.db.get_session()
+                try:
+                    count = len(material_ids) if material_ids else len(materials)
+                    operation = OperationRecord(
+                        operation_type='导出材料',
+                        name=f'导出{count}个材料',
+                        quantity=count,
+                        detail=f'导出材料到Excel: {filename}',
+                        username=username
+                    )
+                    session.add(operation)
+                    self.db.commit_session(session)
+                finally:
+                    self.db.close_session(session)
+            
             return send_file(
                 output,
                 mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -665,3 +684,64 @@ class MaterialService:
             self.logger.error(f'导出Excel失败: {str(e)}', exc_info=True)
             from flask import jsonify
             return jsonify({'success': False, 'message': f'导出失败: {str(e)}'}), 500
+    
+    def generate_import_template(self):
+        """生成材料导入模板"""
+        import openpyxl
+        from flask import send_file
+        from io import BytesIO
+        
+        try:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = '材料导入模板'
+            
+            # 设置列宽
+            ws.column_dimensions['A'].width = 15
+            ws.column_dimensions['B'].width = 12
+            ws.column_dimensions['C'].width = 12
+            ws.column_dimensions['D'].width = 10
+            
+            # 写入表头
+            headers = ['材料名称', '进价', '售价', '数量']
+            ws.append(headers)
+            
+            # 添加示例数据
+            ws.append([
+                '红玛瑙珠子',
+                10.50,
+                15.00,
+                100
+            ])
+            
+            ws.append([
+                '银线',
+                2.30,
+                3.50,
+                50
+            ])
+            
+            # 添加说明文本
+            ws['A5'] = '导入说明：'
+            ws['A6'] = '1. 材料名称：必填，不能重复，最多100个字符'
+            ws['A7'] = '2. 进价：必填，数字类型'
+            ws['A8'] = '3. 售价：可选，默认为进价，数字类型'
+            ws['A9'] = '4. 数量：可选，默认为0，导入后会加到库存中'
+            ws['A10'] = '5. 如果材料名称已存在，将更新该材料的信息'
+            ws['A11'] = '6. 导入不支持图片，请在导入后手动上传材料图片'
+            
+            output = BytesIO()
+            wb.save(output)
+            output.seek(0)
+            
+            return send_file(
+                output,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                as_attachment=True,
+                download_name='材料导入模板.xlsx'
+            )
+            
+        except Exception as e:
+            self.logger.error(f'生成材料导入模板失败: {str(e)}', exc_info=True)
+            from flask import jsonify
+            return jsonify({'success': False, 'message': f'生成模板失败: {str(e)}'}), 500

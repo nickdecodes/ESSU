@@ -10,22 +10,16 @@
 @Software: vscode
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from services.record_service import RecordService
 from config import Config
+import os
 
 record_bp = Blueprint('record', __name__)
 record_service = RecordService()
 
 @record_bp.route('/records')
 def get_records():
-    page = request.args.get('page', 1, type=int)
-    page_size = request.args.get('page_size', Config.MAX_RECORDS_PAGE_SIZE, type=int)
-    
-    # 限制页面大小
-    page_size = min(page_size, Config.MAX_RECORDS_PAGE_SIZE)
-    offset = (page - 1) * page_size
-    
     # 获取筛选参数
     filters = {
         'search': request.args.get('search', ''),
@@ -36,15 +30,41 @@ def get_records():
         'sort_order': request.args.get('sort_order', 'desc')
     }
     
-    records, total = record_service.get_records_filtered(offset, page_size, filters)
+    # 调试信息
+    print(f"Received filters: {filters}")
+    
+    records, total = record_service.get_records_filtered(0, 999999, filters)
     
     return jsonify({
         'data': records,
-        'total': total,
-        'page': page,
-        'page_size': page_size,
-        'total_pages': (total + page_size - 1) // page_size
+        'total': total
     })
+
+@record_bp.route('/records/export')
+def export_records():
+    """导出操作记录"""
+    try:
+        # 获取筛选参数
+        filters = {
+            'search': request.args.get('search', ''),
+            'start_date': request.args.get('start_date', ''),
+            'end_date': request.args.get('end_date', ''),
+            'operation_type': request.args.getlist('operation_type'),
+            'username': request.args.getlist('username'),
+            'sort_order': request.args.get('sort_order', 'desc'),
+            'delete_after_export': request.args.get('deleteAfterExport', 'false').lower() == 'true'
+        }
+        
+        # 导出记录
+        filepath = record_service.export_records_filtered(filters)
+        
+        if filepath and os.path.exists(filepath):
+            return send_file(filepath, as_attachment=True, download_name=os.path.basename(filepath))
+        else:
+            return jsonify({'success': False, 'message': '导出文件生成失败'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'导出失败: {str(e)}'}), 500
 
 @record_bp.route('/records/clear', methods=['DELETE'])
 def clear_all_records():

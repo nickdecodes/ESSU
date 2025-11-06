@@ -31,7 +31,7 @@ class ProductService:
     def _validate_materials(self, session, materials: dict) -> tuple:
         """验证材料是否存在，返回(是否有效, 错误信息, 材料对象字典)"""
         if not materials:
-            return False, '产品必须包含至少一个材料', {}
+            return True, '', {}  # 允许产品不包含材料
         
         material_objs = {}
         for material_id_str in materials.keys():
@@ -78,7 +78,7 @@ class ProductService:
             self.logger.error(f'更新材料引用失败: {str(e)}', exc_info=True)
             return False
     
-    def add_product(self, name: str, materials: dict, in_price: float = 0, out_price: float = 0, manual_price: float = 0, username: str = '', image_path: str = None) -> dict:
+    def add_product(self, name: str, materials: dict, in_price: float = 0, out_price: float = 0, other_price: float = 0, username: str = '', image_path: str = None) -> dict:
         """添加产品"""
         session = self.db.get_session()
         try:
@@ -89,22 +89,32 @@ class ProductService:
                 self.logger.warning(f'产品添加验证失败: {error_msg}')
                 return {'success': False, 'message': error_msg}
             
-            calculated_in_price = 0
-            for material_id_str, required_qty in materials.items():
-                material = material_objs.get(material_id_str)
-                if material:
-                    calculated_in_price += (material.in_price or 0) * required_qty
+            # 只有当有材料时才计算成本价，否则使用传入的价格
+            if materials:
+                calculated_in_price = 0
+                for material_id_str, required_qty in materials.items():
+                    material = material_objs.get(material_id_str)
+                    if material:
+                        calculated_in_price += (material.in_price or 0) * required_qty
+                final_in_price = calculated_in_price
+            else:
+                final_in_price = in_price
             
-            manual_price = manual_price or 0
-            calculated_out_price = calculated_in_price + manual_price
+            other_price = other_price or 0
+            
+            # 只有当有材料时才自动计算售价
+            if materials:
+                final_out_price = final_in_price + other_price
+            else:
+                final_out_price = out_price or final_in_price + other_price
             
             materials_json = json.dumps(materials)
             product = Product(
                 name=name,
                 materials=materials_json,
-                in_price=calculated_in_price,
-                out_price=calculated_out_price,
-                manual_price=manual_price,
+                in_price=final_in_price,
+                out_price=final_out_price,
+                other_price=other_price,
                 image_path=image_path
             )
             
@@ -180,7 +190,7 @@ class ProductService:
                 'materials': materials_with_stock,
                 'in_price': product.in_price,
                 'out_price': product.out_price,
-                'manual_price': product.manual_price or 0,
+                'other_price': product.other_price or 0,
                 'image_path': product.image_path,
                 'stock_count': product.stock_count or 0,
                 'possible_quantity': int(possible_quantity) if possible_quantity != float('inf') else 0,
@@ -329,16 +339,16 @@ class ProductService:
             
             if deleted_count > 0:
                 operation = OperationRecord(
-                    operation_type='批量删除产品',
-                    name=f'批量删除{deleted_count}个产品',
+                    operation_type='删除产品',
+                    name=f'删除{deleted_count}个产品',
                     quantity=deleted_count,
-                    detail=f'批量删除产品ID: {product_ids}',
+                    detail=f'删除产品ID: {product_ids}',
                     username=username
                 )
                 session.add(operation)
             
             if self.db.commit_session(session):
-                self.logger.info(f'批量删除成功: {deleted_count}个产品')
+                self.logger.info(f'删除成功: {deleted_count}个产品')
                 if failed_products:
                     return {
                         'success': False,
@@ -348,16 +358,16 @@ class ProductService:
                     }
                 return {'success': True, 'message': f'成功删除 {deleted_count} 个产品'}
             else:
-                return {'success': False, 'message': '批量删除失败'}
+                return {'success': False, 'message': '删除失败'}
                 
         except Exception as e:
             session.rollback()
-            self.logger.error(f'批量删除产品异常: {str(e)}', exc_info=True)
-            return {'success': False, 'message': '批量删除失败'}
+            self.logger.error(f'删除产品异常: {str(e)}', exc_info=True)
+            return {'success': False, 'message': '删除失败'}
         finally:
             self.db.close_session(session)
 
-    def update_product(self, product_id: int, name: str, materials: dict = None, in_price: float = None, out_price: float = None, manual_price: float = None, username: str = '', image_path: str = None) -> dict:
+    def update_product(self, product_id: int, name: str, materials: dict = None, in_price: float = None, out_price: float = None, other_price: float = None, username: str = '', image_path: str = None) -> dict:
         """更新产品"""
         self.logger.info(f'开始更新产品: {product_id}, 用户: {username}')
         session = self.db.get_session()
@@ -380,18 +390,28 @@ class ProductService:
                 
                 product.materials = json.dumps(materials)
                 
-                calculated_in_price = 0
-                for material_id_str, required_qty in materials.items():
-                    material = material_objs.get(material_id_str)
-                    if material:
-                        calculated_in_price += (material.in_price or 0) * required_qty
-                product.in_price = calculated_in_price
+                # 只有当材料不为空时才重新计算成本价
+                if materials:
+                    calculated_in_price = 0
+                    for material_id_str, required_qty in materials.items():
+                        material = material_objs.get(material_id_str)
+                        if material:
+                            calculated_in_price += (material.in_price or 0) * required_qty
+                    product.in_price = calculated_in_price
             
             product.name = name
-            if manual_price is not None:
-                product.manual_price = manual_price
+            if other_price is not None:
+                product.other_price = other_price
             
-            product.out_price = (product.in_price or 0) + (product.manual_price or 0)
+            # 如果直接传入了成本价和售价，则使用传入的值
+            if in_price is not None:
+                product.in_price = in_price
+            if out_price is not None:
+                product.out_price = out_price
+            
+            # 只有当有材料且没有直接传入价格时才自动计算售价
+            if materials and out_price is None:
+                product.out_price = (product.in_price or 0) + (product.other_price or 0)
             
             if image_path is not None:
                 product.image_path = image_path
@@ -572,10 +592,133 @@ class ProductService:
             self.db.close_session(session)
     
     def import_from_excel(self, file, username: str = '') -> dict:
-        """从Excel导入产品（简化版，不包含材料配方）"""
-        return {'success': False, 'message': '产品导入功能暂不支持，请手动添加'}
+        """从Excel导入产品（简化版，仅支持基本信息）"""
+        import openpyxl
+        from io import BytesIO
+        
+        try:
+            self.logger.info(f'开始导入产品Excel, 用户: {username}')
+            wb = openpyxl.load_workbook(BytesIO(file.read()))
+            ws = wb.active
+            self.logger.info(f'Excel读取成功, 工作表: {ws.title}')
+            
+            created_count = 0
+            updated_count = 0
+            failed_count = 0
+            
+            for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+                # 跳过空行
+                if not any(row):
+                    continue
+                
+                # 检测格式：图片、产品名称、成本价、售价、手工费、库存数量
+                first_col = str(row[0]) if row[0] else ''
+                is_new_format = len(row) >= 6 and (not row[0] or first_col.startswith(('http', 'images/', '#')))
+                
+                if is_new_format:
+                    name_idx, cost_idx, sell_idx, manual_idx, stock_idx = 1, 2, 3, 4, 5
+                else:
+                    # 兼容旧格式：产品名称、成本价、售价、手工费、库存数量
+                    name_idx, cost_idx, sell_idx, manual_idx, stock_idx = 0, 1, 2, 3, 4
+                
+                if not row[name_idx]:
+                    continue
+                
+                try:
+                    name = str(row[name_idx]).strip()
+                    in_price = float(row[cost_idx]) if cost_idx < len(row) and row[cost_idx] else 0
+                    out_price = float(row[sell_idx]) if sell_idx < len(row) and row[sell_idx] else in_price
+                    other_price = float(row[manual_idx]) if manual_idx < len(row) and row[manual_idx] else 0
+                    import_stock = int(row[stock_idx]) if stock_idx < len(row) and row[stock_idx] else 0
+                    
+                    self.logger.info(f'解析行{row_num}: {name}, 成本价={in_price}, 售价={out_price}, 其它费用={other_price}, 库存={import_stock}')
+                    
+                    # 检查产品是否已存在
+                    session = self.db.get_session()
+                    try:
+                        existing = session.query(Product).filter(Product.name == name).first()
+                        
+                        if existing:
+                            # 产品已存在，强制更新价格和库存
+                            self.logger.info(f'更新产品{name}: 原成本价={existing.in_price}, 原售价={existing.out_price}')
+                            existing.in_price = in_price
+                            existing.out_price = out_price
+                            existing.other_price = other_price
+                            self.logger.info(f'更新产品{name}: 新成本价={existing.in_price}, 新售价={existing.out_price}')
+                            if import_stock > 0:
+                                existing.stock_count = (existing.stock_count or 0) + import_stock
+                                
+                            operation = OperationRecord(
+                                operation_type='更新产品',
+                                name=name,
+                                quantity=import_stock,
+                                detail=f'导入更新产品: {name}, 增加库存: +{import_stock}',
+                                username=username
+                            )
+                            session.add(operation)
+                            
+                            if self.db.commit_session(session):
+                                updated_count += 1
+                                self.logger.info(f'产品更新成功: {name}, 增加库存: {import_stock}')
+                            else:
+                                failed_count += 1
+                                self.logger.error(f'产品更新失败: {name}')
+                        else:
+                            # 新产品，创建空材料配方
+                            product = Product(
+                                name=name,
+                                materials='{}',  # 空材料配方
+                                in_price=in_price,
+                                out_price=out_price,
+                                other_price=other_price,
+                                stock_count=import_stock
+                            )
+                            
+                            session.add(product)
+                            
+                            operation = OperationRecord(
+                                operation_type='添加产品',
+                                name=name,
+                                quantity=import_stock,
+                                detail=f'导入产品: {name}, 初始库存: {import_stock}',
+                                username=username
+                            )
+                            session.add(operation)
+                            
+                            if self.db.commit_session(session):
+                                created_count += 1
+                                self.logger.info(f'产品导入成功: {name}')
+                            else:
+                                failed_count += 1
+                                self.logger.error(f'产品导入失败: {name}')
+                    finally:
+                        self.db.close_session(session)
+                        
+                except Exception as e:
+                    self.logger.error(f'第{row_num}行导入失败: {str(e)}', exc_info=True)
+                    failed_count += 1
+            
+            total_count = created_count + updated_count + failed_count
+            success_count = created_count + updated_count
+            msg = f'导入完成，成功 {success_count} 个，失败 {failed_count} 个'
+            if failed_count > 0:
+                msg += '\n注意：导入的产品将使用空材料配方，请手动编辑添加材料清单'
+            
+            self.logger.info(msg)
+            return {
+                'success': True, 
+                'message': msg,
+                'total_count': total_count,
+                'created_count': created_count,
+                'updated_count': updated_count
+            }
+            
+        except Exception as e:
+            msg = f'导入Excel失败: {str(e)}'
+            self.logger.error(msg, exc_info=True)
+            return {'success': False, 'message': msg}
     
-    def export_to_excel(self, product_ids: list = None):
+    def export_to_excel(self, product_ids: list = None, username: str = ''):
         """导出产品到Excel"""
         import openpyxl
         from flask import send_file
@@ -583,6 +726,7 @@ class ProductService:
         from datetime import datetime
         from PIL import Image
         from openpyxl.drawing.image import Image as XLImage
+        from openpyxl.styles import Alignment
         from config import Config
         import os
         
@@ -593,15 +737,16 @@ class ProductService:
             
             ws.column_dimensions['A'].width = 15
             ws.column_dimensions['B'].width = 15
-            ws.column_dimensions['C'].width = 12
+            ws.column_dimensions['C'].width = 25
             ws.column_dimensions['D'].width = 12
             ws.column_dimensions['E'].width = 12
             ws.column_dimensions['F'].width = 12
-            ws.column_dimensions['G'].width = 15
-            ws.column_dimensions['H'].width = 20
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 15
             ws.column_dimensions['I'].width = 20
+            ws.column_dimensions['J'].width = 20
             
-            headers = ['图片', '产品名称', '成本价', '售价', '手工费', '库存数量', '可制作数量', '创建时间', '更新时间']
+            headers = ['图片', '产品名称', '材料清单', '成本价', '售价', '其它费用', '库存数量', '可制作数量', '创建时间', '更新时间']
             ws.append(headers)
             
             session = self.db.get_session()
@@ -616,12 +761,23 @@ class ProductService:
                 
                 row_idx = 2
                 for product in processed_products:
+                    # 构建材料清单字符串
+                    materials_text = ''
+                    if product.get('materials') and isinstance(product['materials'], list):
+                        material_list = []
+                        for material in product['materials']:
+                            name = material.get('name', material.get('product_id', ''))
+                            required = material.get('required', 0)
+                            material_list.append(f'{name}×{required}')
+                        materials_text = ', '.join(material_list)
+                    
                     ws.append([
                         '',
                         product['name'],
+                        materials_text,
                         product['in_price'],
                         product['out_price'],
-                        product['manual_price'],
+                        product['other_price'],
                         product['stock_count'],
                         product['possible_quantity'],
                         product['created_at'],
@@ -652,6 +808,9 @@ class ProductService:
                         except Exception as e:
                             self.logger.warning(f'插入图片失败: {product["name"]} - {str(e)}')
                     
+                    # 设置材料清单列自动换行
+                    ws[f'C{row_idx}'].alignment = openpyxl.styles.Alignment(wrap_text=True, vertical='top')
+                    
                     row_idx += 1
             finally:
                 self.db.close_session(session)
@@ -661,6 +820,23 @@ class ProductService:
             output.seek(0)
             
             filename = f'products_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            
+            # 记录导出操作
+            if username:
+                session = self.db.get_session()
+                try:
+                    count = len(product_ids) if product_ids else len(processed_products)
+                    operation = OperationRecord(
+                        operation_type='导出产品',
+                        name=f'导出{count}个产品',
+                        quantity=count,
+                        detail=f'导出产品到Excel: {filename}',
+                        username=username
+                    )
+                    session.add(operation)
+                    self.db.commit_session(session)
+                finally:
+                    self.db.close_session(session)
             
             return send_file(
                 output,
@@ -673,3 +849,68 @@ class ProductService:
             self.logger.error(f'导出Excel失败: {str(e)}', exc_info=True)
             from flask import jsonify
             return jsonify({'success': False, 'message': f'导出失败: {str(e)}'}), 500
+    
+    def generate_import_template(self):
+        """生成产品导入模板"""
+        import openpyxl
+        from flask import send_file
+        from io import BytesIO
+        
+        try:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = '产品导入模板'
+            
+            # 设置列宽
+            ws.column_dimensions['A'].width = 15
+            ws.column_dimensions['B'].width = 12
+            ws.column_dimensions['C'].width = 12
+            ws.column_dimensions['D'].width = 12
+            ws.column_dimensions['E'].width = 12
+            
+            # 写入表头
+            headers = ['产品名称', '成本价', '售价', '其它费用', '库存数量']
+            ws.append(headers)
+            
+            # 添加示例数据
+            ws.append([
+                '红玛瑙手串',
+                25.50,
+                35.00,
+                5.00,
+                10
+            ])
+            
+            ws.append([
+                '蓝宝石项链',
+                45.00,
+                65.00,
+                10.00,
+                5
+            ])
+            
+            # 添加说明文本
+            ws['A5'] = '导入说明：'
+            ws['A6'] = '1. 产品名称：必填，不能重复，最多100个字符'
+            ws['A7'] = '2. 成本价：必填，数字类型'
+            ws['A8'] = '3. 售价：必填，数字类型'
+            ws['A9'] = '4. 其它费用：可选，默认为0，数字类型'
+            ws['A10'] = '5. 库存数量：可选，默认为0，导入后会加到库存中'
+            ws['A11'] = '6. 如果产品名称已存在，将更新该产品的信息'
+            ws['A12'] = '7. 导入不支持图片，请在导入后手动上传产品图片'
+            
+            output = BytesIO()
+            wb.save(output)
+            output.seek(0)
+            
+            return send_file(
+                output,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                as_attachment=True,
+                download_name='产品导入模板.xlsx'
+            )
+            
+        except Exception as e:
+            self.logger.error(f'生成产品导入模板失败: {str(e)}', exc_info=True)
+            from flask import jsonify
+            return jsonify({'success': False, 'message': f'生成模板失败: {str(e)}'}), 500

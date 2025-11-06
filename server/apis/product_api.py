@@ -14,11 +14,11 @@ def add_product():
     name = data.get('name', '')
     in_price = data.get('in_price', 0)
     out_price = data.get('out_price', 0)
-    manual_price = data.get('manual_price', 0)
+    other_price = data.get('other_price', 0)
     username = data.get('username', '')
     image_path = data.get('image_path')
     
-    result = product_service.add_product(name, data['materials'], in_price, out_price, manual_price, username, image_path)
+    result = product_service.add_product(name, data['materials'], in_price, out_price, other_price, username, image_path)
     if result['success']:
         return jsonify({'success': True, 'product_id': result['product_id']})
     else:
@@ -50,11 +50,11 @@ def update_product(product_id):
     materials = data.get('materials')
     in_price = data.get('in_price')
     out_price = data.get('out_price')
-    manual_price = data.get('manual_price')
+    other_price = data.get('other_price')
     username = data.get('username', '')
     image_path = data.get('image_path')
     
-    result = product_service.update_product(product_id, name, materials, in_price, out_price, manual_price, username, image_path)
+    result = product_service.update_product(product_id, name, materials, in_price, out_price, other_price, username, image_path)
     return jsonify(result)
 
 @product_bp.route('/products/<int:product_id>', methods=['DELETE'])
@@ -137,5 +137,10 @@ def import_products():
 @product_bp.route('/products/export')
 def export_products():
     product_ids = request.args.get('product_ids', '')
+    username = request.args.get('username', '')
     id_list = [int(id) for id in product_ids.split(',') if id] if product_ids else []
-    return product_service.export_to_excel(id_list)
+    return product_service.export_to_excel(id_list, username)
+
+@product_bp.route('/products/import-template')
+def download_import_template():
+    return product_service.generate_import_template()

@@ -56,7 +56,7 @@ class Product(Base):
     materials = Column(Text, nullable=False)  # JSON格式存储材料信息
     in_price = Column(Float, nullable=False, default=0)
     out_price = Column(Float, nullable=False, default=0)
-    manual_price = Column(Float, nullable=False, default=0)
+    other_price = Column(Float, nullable=False, default=0)
     stock_count = Column(Integer, default=0)
     image_path = Column(String(255))
     created_at = Column(DateTime, default=china_now)

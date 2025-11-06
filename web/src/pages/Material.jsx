@@ -1,5 +1,5 @@
 import { AppstoreOutlined, BarChartOutlined, DeleteOutlined, DownOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PictureOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Form, Image, Input, InputNumber, Modal, Result, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import { api } from '../utils/api';
@@ -46,6 +46,9 @@ const Material = ({ user }) => {
   const [inModalVisible, setInModalVisible] = useState(false);
   const [outModalVisible, setOutModalVisible] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [importHelpVisible, setImportHelpVisible] = useState(false);
+  const [importResultVisible, setImportResultVisible] = useState(false);
+  const [importResult, setImportResult] = useState(null);
   
   const totalStock = (materials || []).reduce((sum, material) => sum + (material.stock_count || 0), 0);
   const totalValue = (materials || []).reduce((sum, material) => sum + ((material.out_price || 0) * (material.stock_count || 0)), 0);
@@ -707,15 +710,19 @@ const Material = ({ user }) => {
         await new Promise(resolve => setTimeout(resolve, minDelay));
       }
       
+      setImportResult(response.data);
+      setImportResultVisible(true);
+      
       if (response.data.success) {
-        message.success(response.data.message || '导入成功');
         loadMaterials();
-      } else {
-        message.error(response.data.message || '导入失败');
       }
     } catch (error) {
       console.error('导入失败:', error);
-      message.error('导入失败');
+      setImportResult({
+        success: false,
+        message: '导入失败：' + (error.response?.data?.message || error.message)
+      });
+      setImportResultVisible(true);
     } finally {
       setImportLoading(false);
       e.target.value = '';
@@ -741,7 +748,7 @@ const Material = ({ user }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const materialIds = materials.join(',');
-      window.open(`${Config.API_BASE_URL}/materials/export?material_ids=${materialIds}`, '_blank');
+      api.exportMaterials(materialIds, user.username);
     } finally {
       setExportLoading(false);
     }
@@ -955,7 +962,7 @@ const Material = ({ user }) => {
                   <Col span={12}>
                     <Button 
                       icon={<ImportOutlined />}
-                      onClick={() => document.getElementById('material-import-input').click()}
+                      onClick={() => setImportHelpVisible(true)}
                       loading={importLoading}
                       disabled={importLoading}
                       block
@@ -1094,7 +1101,7 @@ const Material = ({ user }) => {
                   </Button>
                   <Button 
                     icon={<ImportOutlined />}
-                    onClick={() => document.getElementById('material-import-input').click()}
+                    onClick={() => setImportHelpVisible(true)}
                     loading={importLoading}
                     disabled={importLoading}
                   >
@@ -1542,6 +1549,107 @@ const Material = ({ user }) => {
           </p>
         </div>
         </Spin>
+      </Modal>
+      
+      <Modal
+        title="材料导入说明"
+        open={importHelpVisible}
+        onCancel={() => setImportHelpVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setImportHelpVisible(false)}>
+            取消
+          </Button>,
+          <Button key="download" type="primary" onClick={() => {
+            api.downloadMaterialImportTemplate();
+            setImportHelpVisible(false);
+          }}>
+            下载模板
+          </Button>,
+          <Button key="import" type="primary" onClick={() => {
+            document.getElementById('material-import-input').click();
+            setImportHelpVisible(false);
+          }}>
+            选择文件导入
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 600}
+      >
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Typography.Title level={5}>导入格式说明：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li><strong>材料名称：</strong>必填，不能重复，最多100个字符</li>
+                <li><strong>进价：</strong>必填，数字类型</li>
+                <li><strong>售价：</strong>可选，默认为进价，数字类型</li>
+                <li><strong>数量：</strong>可选，默认为0，导入后会加到库存中</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>导入步骤：</Typography.Title>
+            <Typography.Paragraph>
+              <ol style={{ paddingLeft: '20px' }}>
+                <li>点击"下载模板"获取Excel模板文件</li>
+                <li>在模板中填入材料数据（可参考模板中的示例）</li>
+                <li>保存Excel文件</li>
+                <li>点击"选择文件导入"上传文件</li>
+              </ol>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>注意事项：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li>如果材料名称已存在，将更新该材料的信息</li>
+                <li>导入不支持图片，请在导入后手动上传材料图片</li>
+                <li>支持.xlsx和.xls格式的Excel文件</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+        </Space>
+      </Modal>
+      
+      <Modal
+        title="导入结果"
+        open={importResultVisible}
+        onCancel={() => {
+          setImportResultVisible(false);
+          setImportResult(null);
+        }}
+        footer={[
+          <Button key="close" type="primary" onClick={() => {
+            setImportResultVisible(false);
+            setImportResult(null);
+          }}>
+            关闭
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 500}
+      >
+        {importResult && (
+          <Result
+            status={importResult.success ? 'success' : 'error'}
+            title={importResult.success ? '导入成功' : '导入失败'}
+            subTitle={
+              importResult.success ? (
+                <Space direction="vertical" size="small">
+                  <div>共处理 {importResult.total_count} 个材料</div>
+                  <div>新增 {importResult.created_count} 个，更新 {importResult.updated_count} 个</div>
+                  <div style={{ color: '#faad14', fontSize: '12px' }}>
+                    注意：导入不支持图片，请手动上传材料图片
+                  </div>
+                </Space>
+              ) : (
+                <div style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+                  {importResult.message}
+                </div>
+              )
+            }
+          />
+        )}
       </Modal>
     </>
   );

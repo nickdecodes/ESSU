@@ -19,7 +19,15 @@ export const api = {
   deleteUser: (username, data = {}) => request.delete(`/users/${username}`, data),
   removeUserSession: (username, sessionId, data = {}) => request.delete(`/users/${username}/sessions/${sessionId}`, data),
   importUsers: (formData) => axios.post(`${API_BASE}/users/import`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  exportUsers: (userIds) => window.open(`${API_BASE}/users/export?user_ids=${encodeURIComponent(userIds)}`, '_blank'),
+  exportUsers: (userIds, operator) => {
+    const params = new URLSearchParams();
+    if (userIds) params.append('user_ids', userIds);
+    if (operator) params.append('operator', operator);
+    window.open(`${API_BASE}/users/export?${params.toString()}`, '_blank');
+  },
+  downloadUserImportTemplate: () => {
+    window.open(`${API_BASE}/users/import-template`, '_blank');
+  },
 
   // 材料相关
   getMaterials: (page = 1, pageSize = 20, filters = {}) => {
@@ -36,6 +44,15 @@ export const api = {
   materialIn: (data) => request.post('/materials/in', data),
   materialOut: (data) => request.post('/materials/out', data),
   importMaterials: (formData) => axios.post(`${API_BASE}/materials/import`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  exportMaterials: (materialIds, username) => {
+    const params = new URLSearchParams();
+    if (materialIds) params.append('material_ids', materialIds);
+    if (username) params.append('username', username);
+    window.open(`${API_BASE}/materials/export?${params.toString()}`, '_blank');
+  },
+  downloadMaterialImportTemplate: () => {
+    window.open(`${API_BASE}/materials/import-template`, '_blank');
+  },
 
   
   // 产品相关
@@ -53,14 +70,22 @@ export const api = {
   productOut: (data) => request.post('/products/out', data),
   productRestore: (data) => request.post('/products/restore', data),
   importProducts: (formData) => axios.post(`${API_BASE}/products/import`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  exportProducts: (productIds, username) => {
+    const params = new URLSearchParams();
+    if (productIds) params.append('product_ids', productIds);
+    if (username) params.append('username', username);
+    window.open(`${API_BASE}/products/export?${params.toString()}`, '_blank');
+  },
+  downloadProductImportTemplate: () => {
+    window.open(`${API_BASE}/products/import-template`, '_blank');
+  },
 
-  // 数据导出
-  exportDatabase: () => request.get('/export/database'),
+
 
   // 操作记录
   getRecords: (params = {}) => {
-    const { page = 1, pageSize = 50, search = '', dateRange = [], operationType = [], username = [], sortOrder = 'desc' } = params;
-    const queryParams = { page, page_size: pageSize, sort_order: sortOrder };
+    const { search = '', dateRange = [], operationType = [], username = [], sortOrder = 'desc' } = params;
+    const queryParams = { sort_order: sortOrder };
     
     if (search) queryParams.search = search;
     if (dateRange?.length === 2) {
@@ -70,13 +95,56 @@ export const api = {
     if (operationType?.length) queryParams.operation_type = operationType;
     if (username?.length) queryParams.username = username;
     
-    return request.get('/records', queryParams);
+    return axios.get(`${API_BASE}/records`, { 
+      params: queryParams,
+      paramsSerializer: params => {
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            value.forEach(item => searchParams.append(key, item));
+          } else {
+            searchParams.append(key, value);
+          }
+        });
+        return searchParams.toString();
+      }
+    });
   },
   getAllRecords: () => request.get('/records', { page_size: 1000 }),
   clearAllRecords: (username) => request.delete('/records/clear', { username }),
   exportRecords: (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
-    window.open(`${API_BASE}/export/records${queryString ? `?${queryString}` : ''}`, '_blank');
+    const { search = '', dateRange = [], operationType = [], username = [], sortOrder = 'desc', deleteAfterExport = false } = params;
+    const queryParams = { sort_order: sortOrder };
+    
+    if (search) queryParams.search = search;
+    if (dateRange?.length === 2) {
+      queryParams.start_date = dateRange[0].format('YYYY-MM-DD');
+      queryParams.end_date = dateRange[1].format('YYYY-MM-DD');
+    }
+    if (operationType?.length) {
+      operationType.forEach(type => {
+        if (!queryParams.operation_type) queryParams.operation_type = [];
+        queryParams.operation_type.push(type);
+      });
+    }
+    if (username?.length) {
+      username.forEach(user => {
+        if (!queryParams.username) queryParams.username = [];
+        queryParams.username.push(user);
+      });
+    }
+    if (deleteAfterExport) queryParams.deleteAfterExport = 'true';
+    
+    const searchParams = new URLSearchParams();
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(item => searchParams.append(key, item));
+      } else {
+        searchParams.append(key, value);
+      }
+    });
+    
+    window.open(`${API_BASE}/records/export?${searchParams.toString()}`, '_blank');
   },
   deleteRecords: (data) => request.delete('/records', data)
 };

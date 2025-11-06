@@ -14,12 +14,10 @@ import os
 import uuid
 from flask import Blueprint, request, jsonify, send_file, send_from_directory
 from werkzeug.utils import secure_filename
-from services.export_service import ExportService
 from config import Config
 
 
 common_bp = Blueprint('common', __name__)
-export_service = ExportService()
 
 
 def allowed_file(filename):
@@ -61,25 +59,4 @@ def serve_image(filename):
     return send_from_directory(Config.UPLOAD_FOLDER, filename)
 
 
-@common_bp.route('/export/materials')
-def export_materials():
-    filepath = export_service.export_materials()
-    return send_file(filepath, as_attachment=True, download_name=os.path.basename(filepath))
 
-
-@common_bp.route('/export/formulas')
-def export_formulas():
-    filepath = export_service.export_formulas()
-    return send_file(filepath, as_attachment=True, download_name=os.path.basename(filepath))
-
-
-@common_bp.route('/export/users')
-def export_users():
-    filepath = export_service.export_users()
-    return send_file(filepath, as_attachment=True, download_name=os.path.basename(filepath))
-
-
-@common_bp.route('/export/all')
-def export_all():
-    filepath = export_service.export_all()
-    return send_file(filepath, as_attachment=True, download_name=os.path.basename(filepath))

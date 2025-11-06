@@ -126,6 +126,41 @@ class RecordService:
         finally:
             self.db.close_session(session)
     
+    def export_records_filtered(self, filters: dict):
+        """根据筛选条件导出操作记录"""
+        import pandas as pd
+        import os
+        from utils.timezone_utils import china_now
+        from config import Config
+        
+        session = self.db.get_session()
+        try:
+            # 获取符合条件的记录
+            records, _ = self.get_records_filtered(0, 999999, filters)
+            
+            data = []
+            for r in records:
+                data.append({
+                    '操作时间': r['created_at'],
+                    '操作类型': r['operation_type'],
+                    '操作详情': r['detail'] or '',
+                    '操作用户': r['username'] or ''
+                })
+            
+            df = pd.DataFrame(data)
+            filename = f'operation_records_{china_now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            filepath = os.path.join(Config.EXPORT_FOLDER, filename)
+            df.to_excel(filepath, index=False)
+            
+            # 如果需要删除原数据
+            if filters.get('delete_after_export', False):
+                # 这里可以实现删除逻辑，但需要谨慎
+                pass
+            
+            return filepath
+        finally:
+            self.db.close_session(session)
+    
     def clear_all_records(self, username: str = '') -> bool:
         """清空所有操作记录"""
         session = self.db.get_session()

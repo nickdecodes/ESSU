@@ -22,7 +22,7 @@ from apis.product_api import product_bp
 from apis.record_api import record_bp
 from apis.user_api import user_bp
 from apis.common_api import common_bp
-from apis.export_api import export_bp
+
 
 # 配置日志
 def setup_logging():
@@ -60,7 +60,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(product_bp)
 app.register_blueprint(record_bp)
 app.register_blueprint(common_bp)
-app.register_blueprint(export_bp)
+
 
 # 记录服务启动
 app.logger.info('ESSU服务启动')

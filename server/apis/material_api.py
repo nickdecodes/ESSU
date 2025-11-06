@@ -163,5 +163,10 @@ def import_materials():
 @material_bp.route('/materials/export')
 def export_materials():
     material_ids = request.args.get('material_ids', '')
+    username = request.args.get('username', '')
     id_list = [int(id) for id in material_ids.split(',') if id] if material_ids else []
-    return material_service.export_to_excel(id_list)
+    return material_service.export_to_excel(id_list, username)
+
+@material_bp.route('/materials/import-template')
+def download_import_template():
+    return material_service.generate_import_template()

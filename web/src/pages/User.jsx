@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, ExportOutlined, ImportOutlined, UserAddOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Form, Input, List, Modal, Row, Select, Space, Spin, Table, Tag, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Form, Input, List, Modal, Result, Row, Select, Space, Spin, Table, Tag, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import UserAvatar from '../components/UserAvatar';
@@ -38,6 +38,9 @@ const User = ({ user }) => {
   const [batchDeleteLoading, setBatchDeleteLoading] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [importHelpVisible, setImportHelpVisible] = useState(false);
+  const [importResultVisible, setImportResultVisible] = useState(false);
+  const [importResult, setImportResult] = useState(null);
   const handleViewDevices = (user) => {
     setSelectedUser(user);
     setDevicesModalVisible(true);
@@ -106,10 +109,17 @@ const User = ({ user }) => {
     setUserLoading(true);
     try {
       const startTime = Date.now();
-      const hasAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
-      const response = hasAvatar
-        ? await uploadFormData('/users', {...values, operator: user.username}, modalAvatarFileList[0].originFileObj, 'avatar')
-        : await api.addUser({...values, operator: user.username});
+      const hasFileAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
+      const hasUrlAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].url && !modalAvatarFileList[0].originFileObj;
+      
+      let response;
+      if (hasFileAvatar) {
+        response = await uploadFormData('/users', {...values, operator: user.username}, modalAvatarFileList[0].originFileObj, 'avatar');
+      } else if (hasUrlAvatar) {
+        response = await api.addUser({...values, avatar_url: modalAvatarFileList[0].url, operator: user.username});
+      } else {
+        response = await api.addUser({...values, operator: user.username});
+      }
       
       const elapsed = Date.now() - startTime;
       const minDelay = Math.max(0, 500 - elapsed);
@@ -154,16 +164,25 @@ const User = ({ user }) => {
     try {
       const startTime = Date.now();
       if (editingUser) {
-        const hasAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
+        const hasFileAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].originFileObj;
+        const hasUrlAvatar = modalAvatarFileList?.length > 0 && modalAvatarFileList[0].url && !modalAvatarFileList[0].originFileObj;
         const additionalData = { username: values.username, role: values.role, operator: user.username };
         if (values.password?.trim() && values.password !== editingUser.password) additionalData.password = values.password;
         
-        const response = hasAvatar
-          ? await uploadWithImage(modalAvatarFileList[0].originFileObj, 'avatar', `/users/${editingUser.id}`, 'PUT', additionalData)
-          : await api.updateUser(editingUser.id, { 
-              ...additionalData,
-              avatar_path: modalAvatarFileList[0]?.url ? editingUser.avatar_path : null
-            });
+        let response;
+        if (hasFileAvatar) {
+          response = await uploadWithImage(modalAvatarFileList[0].originFileObj, 'avatar', `/users/${editingUser.id}`, 'PUT', additionalData);
+        } else if (hasUrlAvatar) {
+          response = await api.updateUser(editingUser.id, { 
+            ...additionalData,
+            avatar_url: modalAvatarFileList[0].url
+          });
+        } else {
+          response = await api.updateUser(editingUser.id, { 
+            ...additionalData,
+            avatar_path: modalAvatarFileList.length > 0 ? editingUser.avatar_path : null
+          });
+        }
         
         if (!response.data.success) {
           message.error(response.data.message || '用户更新失败');
@@ -333,15 +352,19 @@ const User = ({ user }) => {
         await new Promise(resolve => setTimeout(resolve, minDelay));
       }
       
+      setImportResult(response.data);
+      setImportResultVisible(true);
+      
       if (response.data.success) {
-        message.success(response.data.message || '导入成功');
         loadUsers();
-      } else {
-        message.error(response.data.message || '导入失败');
       }
     } catch (error) {
       console.error('导入失败:', error);
-      message.error('导入失败');
+      setImportResult({
+        success: false,
+        message: '导入失败：' + (error.response?.data?.message || error.message)
+      });
+      setImportResultVisible(true);
     } finally {
       setImportLoading(false);
       e.target.value = '';
@@ -357,7 +380,7 @@ const User = ({ user }) => {
       const userIds = selectedRowKeys.length > 0 
         ? selectedRowKeys.join(',') 
         : filteredUsers.map(u => u.id).join(',');
-      api.exportUsers(userIds);
+      api.exportUsers(userIds, user.username);
     } finally {
       setExportLoading(false);
     }
@@ -387,7 +410,7 @@ const User = ({ user }) => {
         </Button>
       </Col>
       <Col span={12}>
-        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()} loading={importLoading} disabled={importLoading} block>
+        <Button icon={<ImportOutlined />} onClick={() => setImportHelpVisible(true)} loading={importLoading} disabled={importLoading} block>
           导入
         </Button>
       </Col>
@@ -424,7 +447,7 @@ const User = ({ user }) => {
         <Button type="primary" icon={<UserAddOutlined />} onClick={() => openUserModal()}>
           添加
         </Button>
-        <Button icon={<ImportOutlined />} onClick={() => document.getElementById('user-import-input').click()} loading={importLoading} disabled={importLoading}>
+        <Button icon={<ImportOutlined />} onClick={() => setImportHelpVisible(true)} loading={importLoading} disabled={importLoading}>
           导入
         </Button>
         <Button icon={<ExportOutlined />} onClick={handleExport} loading={exportLoading} disabled={exportLoading}>
@@ -714,6 +737,106 @@ const User = ({ user }) => {
           <Typography.Text style={{ display: 'block', textAlign: 'center', padding: '40px' }}>
             该用户当前没有在线设备
           </Typography.Text>
+        )}
+      </Modal>
+      
+      <Modal
+        title="用户导入说明"
+        open={importHelpVisible}
+        onCancel={() => setImportHelpVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setImportHelpVisible(false)}>
+            取消
+          </Button>,
+          <Button key="download" type="primary" onClick={() => {
+            api.downloadUserImportTemplate();
+            setImportHelpVisible(false);
+          }}>
+            下载模板
+          </Button>,
+          <Button key="import" type="primary" onClick={() => {
+            document.getElementById('user-import-input').click();
+            setImportHelpVisible(false);
+          }}>
+            选择文件导入
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 600}
+      >
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Typography.Title level={5}>导入格式说明：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li><strong>用户名：</strong>必填，不能重复，最多50个字符</li>
+                <li><strong>密码：</strong>可选，默认为"password"，最多100个字符</li>
+                <li><strong>角色：</strong>可选，只能是"admin"或"user"，默认为"user"</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>导入步骤：</Typography.Title>
+            <Typography.Paragraph>
+              <ol style={{ paddingLeft: '20px' }}>
+                <li>点击“下载模板”获取Excel模板文件</li>
+                <li>在模板中填入用户数据（可参考模板中的示例）</li>
+                <li>保存Excel文件</li>
+                <li>点击“选择文件导入”上传文件</li>
+              </ol>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>注意事项：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li>如果用户名已存在，将更新该用户的信息</li>
+                <li>导入不支持头像，请在导入后手动上传用户头像</li>
+                <li>支持.xlsx和.xls格式的Excel文件</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+        </Space>
+      </Modal>
+      
+      <Modal
+        title="导入结果"
+        open={importResultVisible}
+        onCancel={() => {
+          setImportResultVisible(false);
+          setImportResult(null);
+        }}
+        footer={[
+          <Button key="close" type="primary" onClick={() => {
+            setImportResultVisible(false);
+            setImportResult(null);
+          }}>
+            关闭
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 500}
+      >
+        {importResult && (
+          <Result
+            status={importResult.success ? 'success' : 'error'}
+            title={importResult.success ? '导入成功' : '导入失败'}
+            subTitle={
+              importResult.success ? (
+                <Space direction="vertical" size="small">
+                  <div>共处理 {importResult.total_count} 个用户</div>
+                  <div>新增 {importResult.created_count} 个，更新 {importResult.updated_count} 个</div>
+                  <div style={{ color: '#faad14', fontSize: '12px' }}>
+                    注意：导入不支持头像，请手动上传用户头像
+                  </div>
+                </Space>
+              ) : (
+                <div style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+                  {importResult.message}
+                </div>
+              )
+            }
+          />
         )}
       </Modal>
       </Space>

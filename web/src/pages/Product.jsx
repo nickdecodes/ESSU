@@ -1,5 +1,5 @@
 import { AppstoreOutlined, BarChartOutlined, DeleteOutlined, DownOutlined, EditOutlined, ExportOutlined, EyeOutlined, ImportOutlined, PictureOutlined, PlusOutlined, UndoOutlined, UpOutlined } from '@ant-design/icons';
-import { App, Button, Card, Checkbox, Col, Flex, Form, Image, Input, InputNumber, Modal, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
+import { App, Button, Card, Checkbox, Col, Flex, Form, Image, Input, InputNumber, Modal, Result, Row, Select, Space, Spin, Statistic, Table, Tooltip, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import ImageUpload from '../components/ImageUpload';
 import { api } from '../utils/api';
@@ -51,6 +51,70 @@ const Product = ({ user }) => {
   const [inLoading, setInLoading] = useState(false);
   const [outLoading, setOutLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
+  const [importHelpVisible, setImportHelpVisible] = useState(false);
+  const [importResultVisible, setImportResultVisible] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+
+  // 计算材料成本价格
+  const calculateMaterialPrice = (materials, priceType = 'in_price') => {
+    if (!materials || !Array.isArray(materials) || !products) return 0;
+    return materials.reduce((total, material) => {
+      if (material && material.product_id && material.quantity) {
+        const materialItem = products.find(p => String(p.id) === String(material.product_id));
+        if (materialItem) {
+          const price = materialItem[priceType] || 0;
+          return total + (price * material.quantity);
+        }
+      }
+      return total;
+    }, 0);
+  };
+
+  // 监听添加产品表单材料变化
+  const addFormMaterials = Form.useWatch('materials', productForm);
+  const addFormOtherPrice = Form.useWatch('other_price', productForm);
+  
+  useEffect(() => {
+    if (addFormMaterials && Array.isArray(addFormMaterials)) {
+      // 过滤掉空值和无效材料
+      const validMaterials = addFormMaterials.filter(m => m && m.product_id && m.quantity);
+      if (validMaterials.length > 0) {
+        const inPrice = calculateMaterialPrice(validMaterials, 'in_price');
+        const outPrice = calculateMaterialPrice(validMaterials, 'out_price') + (addFormOtherPrice || 0);
+        
+        productForm.setFieldsValue({
+          in_price: inPrice,
+          out_price: outPrice
+        });
+      } else if (addFormMaterials.length === 0) {
+        // 如果材料清单为空，重置价格为0
+        productForm.setFieldsValue({
+          in_price: 0,
+          out_price: 0
+        });
+      }
+    }
+  }, [addFormMaterials, addFormOtherPrice, products]);
+
+  // 监听编辑产品表单材料变化
+  const editFormMaterials = Form.useWatch('materials', editForm);
+  const editFormOtherPrice = Form.useWatch('other_price', editForm);
+  
+  useEffect(() => {
+    if (editFormMaterials && Array.isArray(editFormMaterials)) {
+      // 过滤掉空值和无效材料
+      const validMaterials = editFormMaterials.filter(m => m && m.product_id && m.quantity);
+      
+      // 只要有材料数组（无论是否为空），都重新计算价格
+      const inPrice = calculateMaterialPrice(validMaterials, 'in_price');
+      const outPrice = calculateMaterialPrice(validMaterials, 'out_price') + (editFormOtherPrice || 0);
+      
+      editForm.setFieldsValue({
+        in_price: inPrice,
+        out_price: outPrice
+      });
+    }
+  }, [editFormMaterials, editFormOtherPrice, products]);
 
   const handleProductIn = async (values) => {
     if (inLoading) return;
@@ -155,7 +219,9 @@ const Product = ({ user }) => {
     setTimeout(() => {
       editForm.setFieldsValue({
         name: product.name,
-        manual_price: product.manual_price || 0,
+        in_price: product.in_price || 0,
+        out_price: product.out_price || 0,
+        other_price: product.other_price || 0,
         materials: product.materials.map(m => ({
           product_id: String(m.product_id),
           quantity: m.required
@@ -177,7 +243,9 @@ const Product = ({ user }) => {
       const updateData = {
         name: values.name,
         materials: materials,
-        manual_price: values.manual_price || 0
+        in_price: values.in_price || 0,
+        out_price: values.out_price || 0,
+        other_price: values.other_price || 0
       };
       
       const response = await api.updateProduct(editingProduct.id, updateData);
@@ -401,9 +469,11 @@ const Product = ({ user }) => {
     try {
       const startTime = Date.now();
       const materials = {};
-      values.materials?.forEach(m => {
-        if (m.product_id && m.quantity) materials[m.product_id] = parseInt(m.quantity);
-      });
+      if (values.materials) {
+        values.materials.forEach(m => {
+          if (m.product_id && m.quantity) materials[m.product_id] = parseInt(m.quantity);
+        });
+      }
       
       let imagePath = null;
       if (productFileList?.length > 0 && productFileList[0].originFileObj) {
@@ -411,7 +481,15 @@ const Product = ({ user }) => {
         if (result.data.success) imagePath = result.data.image_path;
       }
       
-      const response = await api.addProduct({ name: values.name, materials, manual_price: values.manual_price || 0, image_path: imagePath, username: user.username });
+      const response = await api.addProduct({ 
+        name: values.name, 
+        materials, 
+        in_price: values.in_price || 0,
+        out_price: values.out_price || 0,
+        other_price: values.other_price || 0, 
+        image_path: imagePath, 
+        username: user.username 
+      });
       
       const elapsed = Date.now() - startTime;
       const minDelay = Math.max(0, 500 - elapsed);
@@ -464,15 +542,20 @@ const Product = ({ user }) => {
       if (minDelay > 0) {
         await new Promise(resolve => setTimeout(resolve, minDelay));
       }
+      
+      setImportResult(response.data);
+      setImportResultVisible(true);
+      
       if (response.data.success) {
-        message.success(response.data.message || '导入成功');
         loadProducts();
-      } else {
-        message.error(response.data.message || '导入失败');
       }
     } catch (error) {
       console.error('导入失败:', error);
-      message.error('导入失败');
+      setImportResult({
+        success: false,
+        message: '导入失败：' + (error.response?.data?.message || error.message)
+      });
+      setImportResultVisible(true);
     } finally {
       setImportLoading(false);
       e.target.value = '';
@@ -499,7 +582,7 @@ const Product = ({ user }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const productIds = products.join(',');
-      window.open(`${Config.API_BASE_URL}/products/export?product_ids=${productIds}`, '_blank');
+      api.exportProducts(productIds, user.username);
     } finally {
       setExportLoading(false);
     }
@@ -590,7 +673,10 @@ const Product = ({ user }) => {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
                   <div style={{ fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     成本: <span style={{ fontWeight: '600' }}>¥{(() => {
-                      if (!product.materials || !Array.isArray(product.materials) || !products) return '0.00';
+                      if (!product.materials || !Array.isArray(product.materials) || product.materials.length === 0) {
+                        return (product.in_price || 0).toFixed(2);
+                      }
+                      if (!products) return '0.00';
                       const cost = product.materials.reduce((c, m) => {
                         const mat = products.find(p => String(p.id) === String(m.product_id));
                         return c + (mat && m.required ? (mat.in_price || 0) * m.required : 0);
@@ -600,11 +686,14 @@ const Product = ({ user }) => {
                   </div>
                   <div style={{ fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     售价: <span style={{ fontWeight: '600' }}>¥{(() => {
-                      if (!product.materials || !Array.isArray(product.materials) || !products) return '0.00';
+                      if (!product.materials || !Array.isArray(product.materials) || product.materials.length === 0) {
+                        return (product.out_price || 0).toFixed(2);
+                      }
+                      if (!products) return '0.00';
                       const price = product.materials.reduce((p, m) => {
                         const mat = products.find(pr => String(pr.id) === String(m.product_id));
                         return p + (mat && m.required ? (mat.out_price || 0) * m.required : 0);
-                      }, 0) + (product.manual_price || 0);
+                      }, 0) + (product.other_price || 0);
                       return price.toFixed(2);
                     })()}</span>
                   </div>
@@ -933,7 +1022,21 @@ const Product = ({ user }) => {
         return getCost(a) - getCost(b);
       },
       render: (_, record) => {
-        if (!record.materials || !Array.isArray(record.materials) || !products) {
+        // 如果没有材料或材料为空，直接显示数据库中的成本价
+        if (!record.materials || !Array.isArray(record.materials) || record.materials.length === 0) {
+          return (
+            <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ 
+                fontWeight: '500',
+                fontSize: '14px'
+              }}>
+                ¥{(record.in_price || 0).toFixed(2)}
+              </span>
+            </div>
+          );
+        }
+        
+        if (!products) {
           return <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span>-</span></div>;
         }
         
@@ -974,12 +1077,26 @@ const Product = ({ user }) => {
             }
             return price;
           }, 0);
-          return materialSellingPrice + (record.manual_price || 0);
+          return materialSellingPrice + (record.other_price || 0);
         };
         return getSellingPrice(a) - getSellingPrice(b);
       },
       render: (_, record) => {
-        if (!record.materials || !Array.isArray(record.materials) || !products) {
+        // 如果没有材料或材料为空，直接显示数据库中的售价
+        if (!record.materials || !Array.isArray(record.materials) || record.materials.length === 0) {
+          return (
+            <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ 
+                fontWeight: '600',
+                fontSize: '14px'
+              }}>
+                ¥{(record.out_price || 0).toFixed(2)}
+              </span>
+            </div>
+          );
+        }
+        
+        if (!products) {
           return <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span>-</span></div>;
         }
         
@@ -992,7 +1109,7 @@ const Product = ({ user }) => {
           return price;
         }, 0);
         
-        const totalSellingPrice = materialSellingPrice + (record.manual_price || 0);
+        const totalSellingPrice = materialSellingPrice + (record.other_price || 0);
         
         return (
           <div style={{ height: CELL_HEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1337,7 +1454,7 @@ const Product = ({ user }) => {
                 <Col span={12}>
                   <Button 
                     icon={<ImportOutlined />}
-                    onClick={() => document.getElementById('product-import-input').click()}
+                    onClick={() => setImportHelpVisible(true)}
                     loading={importLoading}
                     disabled={importLoading}
                     block
@@ -1476,7 +1593,7 @@ const Product = ({ user }) => {
                   </Button>
                   <Button 
                     icon={<ImportOutlined />}
-                    onClick={() => document.getElementById('product-import-input').click()}
+                    onClick={() => setImportHelpVisible(true)}
                     loading={importLoading}
                     disabled={importLoading}
                   >
@@ -1553,12 +1670,42 @@ const Product = ({ user }) => {
                 />
               </Form.Item>
               <Form.Item 
-                name="manual_price" 
-                label="手工费"
+                name="in_price" 
+                label="成本价"
                 initialValue={0}
               >
                 <InputNumber 
-                  id="product-manual-price"
+                  id="product-in-price"
+                  placeholder="0.00" 
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  prefix="¥"
+                  readOnly={addFormMaterials && addFormMaterials.filter(m => m && m.product_id && m.quantity).length > 0}
+                />
+              </Form.Item>
+              <Form.Item 
+                name="out_price" 
+                label="售价"
+                initialValue={0}
+              >
+                <InputNumber 
+                  id="product-out-price"
+                  placeholder="0.00" 
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  prefix="¥"
+                  readOnly={addFormMaterials && addFormMaterials.filter(m => m && m.product_id && m.quantity).length > 0}
+                />
+              </Form.Item>
+              <Form.Item 
+                name="other_price" 
+                label="其它费用"
+                initialValue={0}
+              >
+                <InputNumber 
+                  id="product-other-price"
                   placeholder="0.00" 
                   min={0}
                   step={0.01}
@@ -1605,9 +1752,10 @@ const Product = ({ user }) => {
                   <div style={{
                     textAlign: 'center',
                     padding: '32px',
-                    marginBottom: '16px'
+                    marginBottom: '16px',
+                    color: '#666'
                   }}>
-                    暂无材料，请点击上方按钮添加
+                    暂无材料清单（可选），点击上方按钮添加材料
                   </div>
                 )}
                 
@@ -1763,16 +1911,38 @@ const Product = ({ user }) => {
         <Form form={editForm} layout="vertical" onFinish={handleUpdateProduct}>
           <Row gutter={24}>
             <Col xs={24} md={16}>
-              <Form.Item name="name" rules={[{ required: true, message: '请输入产品名称' }]}>
+              <Form.Item name="name" label="产品名称" rules={[{ required: true, message: '请输入产品名称' }]}>
                 <Input 
                   id="product-edit-name" 
                   placeholder="产品名称" 
                   allowClear
                 />
               </Form.Item>
-              <Form.Item name="manual_price" label="手工费">
+              <Form.Item name="in_price" label="成本价">
                 <InputNumber 
-                  id="product-edit-manual-price"
+                  id="product-edit-in-price"
+                  placeholder="0.00" 
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  prefix="¥"
+                  readOnly={editFormMaterials && editFormMaterials.filter(m => m && m.product_id && m.quantity).length > 0}
+                />
+              </Form.Item>
+              <Form.Item name="out_price" label="售价">
+                <InputNumber 
+                  id="product-edit-out-price"
+                  placeholder="0.00" 
+                  min={0}
+                  step={0.01}
+                  style={{ width: '100%' }}
+                  prefix="¥"
+                  readOnly={editFormMaterials && editFormMaterials.filter(m => m && m.product_id && m.quantity).length > 0}
+                />
+              </Form.Item>
+              <Form.Item name="other_price" label="其它费用">
+                <InputNumber 
+                  id="product-edit-other-price"
                   placeholder="0.00" 
                   min={0}
                   step={0.01}
@@ -2195,7 +2365,7 @@ const Product = ({ user }) => {
               }
               return price;
             }, 0);
-            return materialSellingPrice + (selectedProduct.manual_price || 0);
+            return materialSellingPrice + (selectedProduct.other_price || 0);
           })()} rules={[
             { required: true, message: '请输入出库价格' },
             { type: 'number', min: 0, message: '价格必须大于等于0' }
@@ -2288,6 +2458,108 @@ const Product = ({ user }) => {
           </Form.Item>
         </Form>
         </Spin>
+      </Modal>
+      
+      <Modal
+        title="产品导入说明"
+        open={importHelpVisible}
+        onCancel={() => setImportHelpVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setImportHelpVisible(false)}>
+            取消
+          </Button>,
+          <Button key="download" type="primary" onClick={() => {
+            api.downloadProductImportTemplate();
+            setImportHelpVisible(false);
+          }}>
+            下载模板
+          </Button>,
+          <Button key="import" type="primary" onClick={() => {
+            document.getElementById('product-import-input').click();
+            setImportHelpVisible(false);
+          }}>
+            选择文件导入
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 600}
+      >
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <div>
+            <Typography.Title level={5}>导入格式说明：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li><strong>产品名称：</strong>必填，不能重复，最多100个字符</li>
+                <li><strong>成本价：</strong>必填，数字类型</li>
+                <li><strong>售价：</strong>必填，数字类型</li>
+                <li><strong>其它费用：</strong>可选，默认为0，数字类型</li>
+                <li><strong>库存数量：</strong>可选，默认为0，导入后会加到库存中</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>导入步骤：</Typography.Title>
+            <Typography.Paragraph>
+              <ol style={{ paddingLeft: '20px' }}>
+                <li>点击"下载模板"获取Excel模板文件</li>
+                <li>在模板中填入产品数据（可参考模板中的示例）</li>
+                <li>保存Excel文件</li>
+                <li>点击"选择文件导入"上传文件</li>
+              </ol>
+            </Typography.Paragraph>
+          </div>
+          
+          <div>
+            <Typography.Title level={5}>注意事项：</Typography.Title>
+            <Typography.Paragraph>
+              <ul style={{ paddingLeft: '20px' }}>
+                <li>如果产品名称已存在，将更新该产品的信息</li>
+                <li>导入不支持图片，请在导入后手动上传产品图片</li>
+                <li>支持.xlsx和.xls格式的Excel文件</li>
+              </ul>
+            </Typography.Paragraph>
+          </div>
+        </Space>
+      </Modal>
+      
+      <Modal
+        title="导入结果"
+        open={importResultVisible}
+        onCancel={() => {
+          setImportResultVisible(false);
+          setImportResult(null);
+        }}
+        footer={[
+          <Button key="close" type="primary" onClick={() => {
+            setImportResultVisible(false);
+            setImportResult(null);
+          }}>
+            关闭
+          </Button>
+        ]}
+        width={isMobile ? '95%' : 500}
+      >
+        {importResult && (
+          <Result
+            status={importResult.success ? 'success' : 'error'}
+            title={importResult.success ? '导入成功' : '导入失败'}
+            subTitle={
+              importResult.success ? (
+                <Space direction="vertical" size="small">
+                  <div>共处理 {importResult.total_count} 个产品</div>
+                  <div>新增 {importResult.created_count} 个，更新 {importResult.updated_count} 个</div>
+                  <div style={{ color: '#faad14', fontSize: '12px' }}>
+                    注意：导入不支持图片，请手动上传产品图片
+                  </div>
+                </Space>
+              ) : (
+                <div style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+                  {importResult.message}
+                </div>
+              )
+            }
+          />
+        )}
       </Modal>
     </>
   );
