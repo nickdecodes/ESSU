@@ -214,3 +214,4 @@ web/node_modules/
 server/logs/
 server/uploads/
 server/exports/
+server/*/__pycache__/
