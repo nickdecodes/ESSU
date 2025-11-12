@@ -28,7 +28,8 @@ class Config:
     LOG_FOLDER = 'logs'
     LOG_FILE = 'logs/essu.log'
     LOG_BACKUP_COUNT = 7
-    LOG_LEVEL = 'INFO'
+    # 日志级别：DEBUG(开发) | INFO(测试) | WARNING(生产)
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')  # 默认INFO，可通过环境变量覆盖
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     # 导出配置
