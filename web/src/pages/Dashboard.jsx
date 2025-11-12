@@ -41,7 +41,6 @@ const Dashboard = ({ user }) => {
           return (
             <Card
               key={item.key}
-              hoverable
               onClick={() => navigate(`/${item.key}`)}
               style={{
                 flex: '1 1 125px',
@@ -49,19 +48,9 @@ const Dashboard = ({ user }) => {
                 borderRadius: '16px',
                 border: 'none',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                height: '100%',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
+                height: '100%'
               }}
-                styles={{ body: { padding: isMobile ? '20px' : '24px', textAlign: 'center' } }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-                }}
+              styles={{ body: { padding: isMobile ? '20px' : '24px', textAlign: 'center' } }}
               >
                 <div
                   style={{
