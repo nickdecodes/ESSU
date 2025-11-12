@@ -12,6 +12,7 @@
 
 import os
 import uuid
+from datetime import datetime
 from flask import Blueprint, request, jsonify, abort, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 from config import Config
@@ -57,3 +58,14 @@ def upload_image():
 @common_bp.route('/images/<filename>')
 def serve_image(filename):
     return send_from_directory(Config.UPLOAD_FOLDER, filename)
+
+
+@common_bp.route('/health')
+def health_check():
+    """健康检查接口"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'version': '1.0.0',
+        'service': 'ESSU'
+    })

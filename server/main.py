@@ -11,12 +11,14 @@
 """
 
 import os
+import time
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, g 
 from flask_cors import CORS
 from dotenv import load_dotenv
 from config import Config
+
 
 # 加载环境变量
 env_file = '.env.development' if os.path.exists('.env.development') else '.env'
@@ -82,16 +84,42 @@ for bp in (material_bp, user_bp, product_bp, record_bp, common_bp):
 app.logger.info('ESSU服务启动')
 
 
-# ============ 请求/响应日志 ============
+# ============ 请求/响应日志和性能监控 ============
 @app.before_request
-def log_request():
+def before_request():
+    """请求开始前的处理"""
+    # 记录请求开始时间
+    g.start_time = time.time()
+    
+    # 记录请求日志
     if request.endpoint and request.endpoint != 'static':
         app.logger.info(f'{request.method} {request.path} | {request.remote_addr}')
 
 @app.after_request
-def log_response(response):
+def after_request(response):
+    """请求结束后的处理"""
     if request.endpoint and request.endpoint != 'static':
-        app.logger.info(f'{request.method} {request.path} - {response.status_code}')
+        # 计算请求耗时
+        if hasattr(g, 'start_time'):
+            elapsed = time.time() - g.start_time
+            
+            # 记录响应日志（包含耗时）
+            app.logger.info(f'{request.method} {request.path} - {response.status_code} - {elapsed:.3f}s')
+            
+            # 慢请求告警
+            if elapsed > Config.SLOW_REQUEST_THRESHOLD:
+                app.logger.warning(
+                    f'慢请求告警: {request.method} {request.path} - '
+                    f'耗时: {elapsed:.3f}s | IP: {request.remote_addr} | '
+                    f'阈值: {Config.SLOW_REQUEST_THRESHOLD}s'
+                )
+            
+            # 添加响应头（可选，用于前端监控）
+            if Config.ENABLE_RESPONSE_TIME_HEADER:
+                response.headers['X-Response-Time'] = f'{elapsed:.3f}s'
+        else:
+            app.logger.info(f'{request.method} {request.path} - {response.status_code}')
+    
     return response
 
 

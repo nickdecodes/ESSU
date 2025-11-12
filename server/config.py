@@ -64,6 +64,10 @@ class Config:
     MAX_CONCURRENT_SESSIONS = 3  # 每个用户最大并发登录数
     SESSION_TIMEOUT = 24 * 60 * 60  # 会话超时时间（秒）
     
+    # 性能监控配置
+    SLOW_REQUEST_THRESHOLD = float(os.getenv('SLOW_REQUEST_THRESHOLD', 1.0))  # 慢请求阈值（秒）
+    ENABLE_RESPONSE_TIME_HEADER = os.getenv('ENABLE_RESPONSE_TIME_HEADER', 'True').lower() == 'true'  # 是否添加响应时间头
+    
     @classmethod
     def init_directories(cls):
         """初始化必要的目录"""

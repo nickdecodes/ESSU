@@ -5,6 +5,7 @@ import zhCN from 'antd/locale/zh_CN';
 import { Config } from './utils/config';
 import { ThemeProvider, useTheme } from './utils/theme';
 
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import MainLayout from './layouts';
 import Dashboard from './pages/Dashboard';
@@ -57,22 +58,27 @@ function AppContent() {
   if (!user) return <Routes><Route path="*" element={<Login onLogin={handleLogin} />} /></Routes>;
 
   const renderContent = () => {
-    switch (currentTab) {
-      case 'home':
-        return <Dashboard user={user} />;
-      case 'material':
-        return <Material user={user} />;
-      case 'product':
-        return <Product user={user} />;
-      case 'records':
-        return user.role === 'admin' ? <Records /> : null;
-      case 'statistics':
-        return <Statistics />;
-      case 'user':
-        return user.role === 'admin' ? <User user={user} /> : null;
-      default:
-        return null;
-    }
+    const content = (() => {
+      switch (currentTab) {
+        case 'home':
+          return <Dashboard user={user} />;
+        case 'material':
+          return <Material user={user} />;
+        case 'product':
+          return <Product user={user} />;
+        case 'records':
+          return user.role === 'admin' ? <Records /> : null;
+        case 'statistics':
+          return <Statistics />;
+        case 'user':
+          return user.role === 'admin' ? <User user={user} /> : null;
+        default:
+          return null;
+      }
+    })();
+
+    // 为每个页面添加独立的错误边界
+    return <ErrorBoundary key={currentTab}>{content}</ErrorBoundary>;
   };
 
   return (
@@ -95,11 +101,13 @@ function AppContent() {
 
 const App = () => {
   return (
-    <HashRouter>
-      <ThemeProvider>
-        <ThemedApp />
-      </ThemeProvider>
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <ThemeProvider>
+          <ThemedApp />
+        </ThemeProvider>
+      </HashRouter>
+    </ErrorBoundary>
   );
 };
 
