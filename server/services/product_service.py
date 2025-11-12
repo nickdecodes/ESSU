@@ -184,9 +184,13 @@ class ProductService:
     
     def get_all_products(self):
         """获取所有配方并计算可制作数量"""
-        with self.db.session_scope() as session:
-            products = session.query(Product).order_by(Product.id).all()
-            return {'success': True, 'products': self._process_products(products)}
+        try:
+            with self.db.session_scope() as session:
+                products = session.query(Product).order_by(Product.id).all()
+                return {'success': True, 'products': self._process_products(products)}
+        except Exception as e:
+            self.logger.error(f'获取所有产品失败: {str(e)}', exc_info=True)
+            return {'success': False, 'message': '获取产品列表失败', 'products': []}
     
     def get_products_paginated(self, offset: int, limit: int):
         """分页获取产品"""

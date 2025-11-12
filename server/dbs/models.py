@@ -65,7 +65,7 @@ class Material(Base):
     in_price = Column(Float, nullable=False, default=0)
     out_price = Column(Float, nullable=False, default=0)
     stock_count = Column(Integer, default=0, index=True)
-    used_by_products = Column(Integer, default=0)
+    used_by_products = Column(Text, default='[]')
     image_path = Column(String(255))
     created_at = Column(DateTime, default=china_now, index=True)
     updated_at = Column(DateTime, default=china_now, onupdate=china_now)
