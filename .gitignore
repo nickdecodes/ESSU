@@ -1,13 +1,10 @@
 # Environment variables
 .env
-.env.local
-.env.*.local
+.env.*
 web/.env
-web/.env.local
-web/.env.*.local
+web/.env.*
 server/.env
-server/.env.local
-server/.env.*.local
+server/.env.*
 
 # Configuration
 config.sh

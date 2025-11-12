@@ -19,7 +19,7 @@ React前端 + Python后端 + 文件数据库架构
 ### 两步启动
 
 ```bash
-# 1. 配置项目（首次运行）
+# 1. 配置项目（首次运行，必需）
 ./configure
 
 # 2. 启动系统
@@ -30,8 +30,10 @@ React前端 + Python后端 + 文件数据库架构
 - ✅ 检查 Python 和 Node.js 环境
 - ✅ 检测包管理器（npm/pnpm）
 - ✅ 配置端口和日志级别
-- ✅ 生成环境变量文件
-- ✅ 可选安装依赖
+- ✅ 生成环境变量文件（`.env.development`）
+- ✅ 智能检测并安装依赖
+
+**注意：** `.env.development` 文件由 `configure` 脚本自动生成，不会提交到 Git
 
 **启动选项：**
 ```bash
