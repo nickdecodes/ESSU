@@ -1,18 +1,35 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, request, jsonify
-from services.material_service import MaterialService
-from config import Config
-import uuid
-import os
-from werkzeug.utils import secure_filename
+"""
+@Author  : nickdecodes
+@Email   : 
+@Usage   : 
+@Filename: material_api.py
+@DateTime: 2025/10/25 23:17
+@Software: vscode
+"""
 
+import os
+import uuid
+import logging
+from flask import Blueprint, request, jsonify, abort
+from werkzeug.utils import secure_filename
+from services.material_service import MaterialService
+from dbs.db_manager import DBManager
+from dbs.models import OperationRecord
+from config import Config
+
+
+logger = logging.getLogger(__name__)
 material_bp = Blueprint('material', __name__)
 material_service = MaterialService()
+db = DBManager()
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
+
 
 @material_bp.route('/materials', methods=['POST'])
 def add_material():
@@ -38,7 +55,7 @@ def add_material():
             file.save(file_path)
             image_path = f"images/{unique_filename}"
         
-        result = material_service.add_material(name, in_price, out_price, username, image_path)
+        result = material_service.add_material(name, in_price, out_price, image_path)
     else:
         data = request.json
         name = data.get('name', '').strip()
@@ -49,31 +66,50 @@ def add_material():
         out_price = data.get('out_price', in_price)
         username = data.get('username', '')
         
-        result = material_service.add_material(name, in_price, out_price, username)
+        result = material_service.add_material(name, in_price, out_price)
     
-    if result['success']:
-        return jsonify({'success': True, 'material_id': result['material_id']})
-    else:
-        return jsonify(result)
+    if result.get('success'):
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='添加材料',
+                name=name,
+                quantity=0,
+                detail=f'添加材料: {name}',
+                username=username
+            ))
+    return jsonify(result)
+
 
 @material_bp.route('/materials')
 def get_materials():
-    page = request.args.get('page', 1, type=int)
-    page_size = request.args.get('page_size', Config.DEFAULT_PAGE_SIZE, type=int)
-    
-    page_size = min(page_size, Config.MAX_PAGE_SIZE)
-    offset = (page - 1) * page_size
-    
-    materials = material_service.get_materials_paginated(offset, page_size)
-    total = material_service.get_materials_count()
-    
-    return jsonify({
-        'data': materials,
-        'total': total,
-        'page': page,
-        'page_size': page_size,
-        'total_pages': (total + page_size - 1) // page_size
-    })
+    try:
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('page_size', Config.DEFAULT_PAGE_SIZE, type=int)
+        
+        page_size = min(page_size, Config.MAX_PAGE_SIZE)
+        offset = (page - 1) * page_size
+        
+        result = material_service.get_materials_paginated(offset, page_size)
+        if not result['success']:
+            return jsonify(result)
+        
+        count_result = material_service.get_materials_count()
+        total = count_result['count'] if count_result['success'] else 0
+        
+        return jsonify({
+            'success': True,
+            'data': result['materials'],
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total + page_size - 1) // page_size
+        })
+    except ValueError as e:
+        logger.warning(f'获取材料列表参数错误: {str(e)}')
+        abort(400, description='无效的分页参数')
+    except Exception as e:
+        logger.error(f'获取材料列表失败: {str(e)}', exc_info=True)
+
 
 @material_bp.route('/materials/<int:material_id>/check-products', methods=['POST'])
 def check_related_products(material_id):
@@ -83,6 +119,7 @@ def check_related_products(material_id):
     
     result = material_service.check_related_products(material_id, in_price, out_price)
     return jsonify(result)
+
 
 @material_bp.route('/materials/<int:material_id>', methods=['PUT'])
 def update_material(material_id):
@@ -96,24 +133,58 @@ def update_material(material_id):
     if not name or len(name) > Config.MAX_NAME_LENGTH:
         return jsonify({'success': False, 'message': f'材料名称不能为空且不能超过{Config.MAX_NAME_LENGTH}个字符'})
     
-    result = material_service.update_material(material_id, name, in_price, out_price, username, image_path)
+    result = material_service.update_material(material_id, name, in_price, out_price, image_path)
+    
+    if result.get('success'):
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='更新材料',
+                name=name,
+                quantity=0,
+                detail=f'更新材料: {name}',
+                username=username
+            ))
     return jsonify(result)
+
 
 @material_bp.route('/materials/<int:material_id>', methods=['DELETE'])
 def delete_material(material_id):
     data = request.json or {}
     username = data.get('username', '')
     
-    result = material_service.delete_material(material_id, username)
+    result = material_service.delete_material(material_id)
+    
+    if result.get('success'):
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='删除材料',
+                name=data.get('name', ''),
+                quantity=0,
+                detail=f'删除材料',
+                username=username
+            ))
     return jsonify(result)
+
 
 @material_bp.route('/materials/batch-delete', methods=['POST'])
 def batch_delete_materials():
     data = request.json
     material_ids = data.get('material_ids', [])
     username = data.get('username', '')
-    result = material_service.batch_delete_materials(material_ids, username)
+    
+    result = material_service.batch_delete_materials(material_ids)
+    
+    if result.get('deleted_count', 0) > 0:
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='删除材料',
+                name=f'删除{result["deleted_count"]}个材料',
+                quantity=result['deleted_count'],
+                detail=f'删除材料ID: {material_ids}',
+                username=username
+            ))
     return jsonify(result)
+
 
 @material_bp.route('/materials/in', methods=['POST'])
 def material_in():
@@ -128,8 +199,19 @@ def material_in():
     if supplier and len(supplier) > Config.MAX_SUPPLIER_LENGTH:
         return jsonify({'success': False, 'message': f'供应商名称不能超过{Config.MAX_SUPPLIER_LENGTH}个字符'})
     
-    result = material_service.inbound(int(material_id), quantity, supplier, username)
+    result = material_service.inbound(int(material_id), quantity, supplier)
+    
+    if result.get('success'):
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='材料入库',
+                name=result.get('material_name', ''),
+                quantity=quantity,
+                detail=f'供应商: {supplier}, 数量: +{quantity}',
+                username=username
+            ))
     return jsonify(result)
+
 
 @material_bp.route('/materials/out', methods=['POST'])
 def material_out():
@@ -139,34 +221,87 @@ def material_out():
     customer = data.get('customer', '')
     username = data.get('username', '')
     
-    result = material_service.outbound(int(material_id), quantity, customer, username)
+    result = material_service.outbound(int(material_id), quantity, customer)
+    
+    if result.get('success'):
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='材料出库',
+                name=result.get('material_name', ''),
+                quantity=-quantity,
+                detail=f'客户: {customer}, 数量: -{quantity}',
+                username=username
+            ))
     return jsonify(result)
+
 
 @material_bp.route('/materials/<int:material_id>/stock')
 def get_material_stock(material_id):
-    stock = material_service.get_stock(material_id)
-    return jsonify({'material_id': material_id, 'stock': stock})
+    result = material_service.get_stock(material_id)
+    if result.get('success'):
+        return jsonify({'success': True, 'material_id': material_id, 'stock': result['stock']})
+    return jsonify(result)
+
 
 @material_bp.route('/materials/import', methods=['POST'])
 def import_materials():
     if 'file' not in request.files:
-        return jsonify({'success': False, 'message': '没有上传文件'})
+        logger.warning('导入材料失败: 没有上传文件')
+        abort(400, description='没有上传文件')
     
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({'success': False, 'message': '文件名为空'})
+    if not file.filename:
+        logger.warning('导入材料失败: 文件名为空')
+        abort(400, description='文件名为空')
     
     username = request.form.get('username', '')
-    result = material_service.import_from_excel(file, username)
+    logger.info(f'导入材料: 文件名={file.filename} | 操作者: {username}')
+    
+    result = material_service.import_from_excel(file)
+    
+    if result.get('success'):
+        logger.info(f'导入材料成功: {result.get("message", "")}')
+        with db.session_scope() as session:
+            session.add(OperationRecord(
+                operation_type='导入材料',
+                name=f'导入{result.get("created_count", 0) + result.get("updated_count", 0)}个材料',
+                quantity=result.get('created_count', 0) + result.get('updated_count', 0),
+                detail=result.get('message', ''),
+                username=username
+            ))
+    else:
+        logger.error(f'导入材料失败: {result.get("message", "")}')
+    
     return jsonify(result)
+
 
 @material_bp.route('/materials/export')
 def export_materials():
     material_ids = request.args.get('material_ids', '')
     username = request.args.get('username', '')
-    id_list = [int(id) for id in material_ids.split(',') if id] if material_ids else []
-    return material_service.export_to_excel(id_list, username)
+    
+    try:
+        id_list = [int(id) for id in material_ids.split(',') if id] if material_ids else []
+        logger.info(f'导出材料: 数量={len(id_list) if id_list else "全部"} | 操作者: {username}')
+        
+        if username:
+            with db.session_scope() as session:
+                count = len(id_list) if id_list else 0
+                session.add(OperationRecord(
+                    operation_type='导出材料',
+                    name=f'导出{count if count else "全部"}个材料',
+                    quantity=count,
+                    detail=f'导出材料到Excel',
+                    username=username
+                ))
+        
+        return material_service.export_to_excel(id_list)
+    except ValueError as e:
+        logger.warning(f'导出材料参数错误: {str(e)}')
+        abort(400, description='无效的材料ID')
+
 
 @material_bp.route('/materials/import-template')
 def download_import_template():
+    logger.info('下载材料导入模板')
     return material_service.generate_import_template()

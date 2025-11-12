@@ -12,7 +12,7 @@
 
 import os
 import uuid
-from flask import Blueprint, request, jsonify, send_file, send_from_directory
+from flask import Blueprint, request, jsonify, abort, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 from config import Config
 
@@ -57,6 +57,3 @@ def upload_image():
 @common_bp.route('/images/<filename>')
 def serve_image(filename):
     return send_from_directory(Config.UPLOAD_FOLDER, filename)
-
-
-
