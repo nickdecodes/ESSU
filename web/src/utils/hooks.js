@@ -29,7 +29,7 @@ export const useAuth = () => {
   return { user, handleLogin, handleLogout };
 };
 
-const useDataLoader = (apiMethod, errorMsg) => {
+const useDataLoader = (apiMethod, errorMsg, dataField = null) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,10 +37,15 @@ const useDataLoader = (apiMethod, errorMsg) => {
     setLoading(true);
     try {
       const res = await apiMethod();
-      setData(res.data.data || res.data);
+      if (res.data.success === false) {
+        throw new Error(res.data.message || errorMsg);
+      }
+      // 如果指定了dataField，使用指定字段；否则尝试data字段或直接使用res.data
+      const responseData = dataField ? res.data[dataField] : (res.data.data || res.data);
+      setData(responseData);
     } catch (error) {
       console.error(errorMsg, error);
-      onError?.(errorMsg);
+      onError?.(error.message || errorMsg);
     } finally {
       setLoading(false);
     }
@@ -50,7 +55,7 @@ const useDataLoader = (apiMethod, errorMsg) => {
 };
 
 export const useMaterials = () => {
-  const { data: materials, loading, loadData, setData } = useDataLoader(api.getAllMaterials, '加载材料失败');
+  const { data: materials, loading, loadData, setData } = useDataLoader(api.getAllMaterials, '加载材料失败', 'materials');
   const [filteredMaterials, setFilteredMaterials] = useState([]);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 8, total: 0 });
 
@@ -62,13 +67,13 @@ export const useMaterials = () => {
 };
 
 export const useProducts = () => {
-  const { data: products, loading, loadData: loadProducts } = useDataLoader(api.getAllProducts, '加载产品失败');
+  const { data: products, loading, loadData: loadProducts } = useDataLoader(api.getAllProducts, '加载产品失败', 'products');
   const [pagination, setPagination] = useState({ current: 1, pageSize: 8, total: 0 });
 
   return { products, loading, loadProducts, pagination, setPagination };
 };
 
 export const useUsers = () => {
-  const { data: users, loadData: loadUsers } = useDataLoader(api.getUsers, '加载用户列表失败');
+  const { data: users, loadData: loadUsers } = useDataLoader(api.getUsers, '加载用户列表失败', 'users');
   return { users, loadUsers };
 };

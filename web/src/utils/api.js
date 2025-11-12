@@ -111,7 +111,7 @@ export const api = {
     });
   },
   getAllRecords: () => request.get('/records', { page_size: 1000 }),
-  clearAllRecords: (username) => request.delete('/records/clear', { username }),
+
   exportRecords: (params = {}) => {
     const { search = '', dateRange = [], operationType = [], username = [], sortOrder = 'desc', deleteAfterExport = false } = params;
     const queryParams = { sort_order: sortOrder };

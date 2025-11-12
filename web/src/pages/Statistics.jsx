@@ -39,16 +39,16 @@ const Statistics = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [materialsRes, formulasRes, recordsRes] = await Promise.all([
+      const [materialsRes, productsRes, recordsRes] = await Promise.all([
         api.getAllMaterials(),
-        api.getAllFormulas(),
-        api.getAllRecords()
+        api.getAllProducts(),
+        api.getRecords()
       ]);
-      const materialsData = materialsRes.data.data || materialsRes.data;
-      const formulasData = formulasRes.data.data || formulasRes.data;
-      const recordsData = recordsRes.data.data || recordsRes.data;
+      const materialsData = materialsRes.data.success ? materialsRes.data.materials : [];
+      const productsData = productsRes.data.success ? productsRes.data.products : [];
+      const recordsData = recordsRes.data.success ? recordsRes.data.data : [];
       setMaterials(Array.isArray(materialsData) ? materialsData : []);
-      setFormulas(Array.isArray(formulasData) ? formulasData : []);
+      setFormulas(Array.isArray(productsData) ? productsData : []);
       setRecords(Array.isArray(recordsData) ? recordsData : []);
     } catch (error) {
       console.error('加载数据失败:', error);
@@ -613,7 +613,7 @@ const Statistics = () => {
                       y={y - 20}
                       textAnchor="middle"
                       fontSize="11"
-                      fill={rgba(0, 0, 0, 0.85)}
+                      fill="rgba(0, 0, 0, 0.85)"
                       fontWeight="600"
                       opacity="0.8"
                     >
@@ -633,7 +633,7 @@ const Statistics = () => {
                     y={375 - (ratio * 320)}
                     textAnchor="end"
                     fontSize="12"
-                    fill={rgba(0, 0, 0, 0.45)}
+                    fill="rgba(0, 0, 0, 0.45)"
                     fontWeight="500"
                   >
                     ¥{(maxProfit * ratio).toFixed(0)}
@@ -662,7 +662,7 @@ const Statistics = () => {
                         y="390"
                         textAnchor="middle"
                         fontSize="11"
-                        fill={rgba(0, 0, 0, 0.45)}
+                        fill="rgba(0, 0, 0, 0.45)"
                         fontWeight="500"
                       >
                         {d.date}

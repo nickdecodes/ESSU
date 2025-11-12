@@ -229,7 +229,7 @@ const Material = ({ user }) => {
 
   const handleSearchChange = setSearchKeywords;
 
-  const getFilteredMaterials = () => filteredMaterials.filter(material => {
+  const getFilteredMaterials = () => (filteredMaterials || []).filter(material => {
     if (searchKeywords.length > 0 && !searchKeywords.includes(material.name)) return false;
     if (stockFilter === 'zero' && material.stock_count > 0) return false;
     if (stockFilter === 'low' && material.stock_count > 5) return false;
@@ -872,7 +872,7 @@ const Material = ({ user }) => {
                 maxTagCount="responsive"
                 getPopupContainer={(triggerNode) => triggerNode.parentElement}
               >
-                {materials.map((material, index) => (
+                {(materials || []).map((material, index) => (
                   <Select.Option 
                     key={`search-${material.id}-${index}`} 
                     value={material.name}
@@ -1015,7 +1015,7 @@ const Material = ({ user }) => {
                   maxTagCount="responsive"
                   getPopupContainer={(triggerNode) => triggerNode.parentElement}
                 >
-                  {materials.map((material, index) => (
+                  {(materials || []).map((material, index) => (
                     <Select.Option 
                       key={`search-${material.id}-${index}`} 
                       value={material.name}
@@ -1064,7 +1064,7 @@ const Material = ({ user }) => {
                     </Select.Option>
                   ))}
                 </Select>
-                {user.role === 'admin' && (
+                {user?.role === 'admin' && (
                   <>
                     <Select
                       placeholder="库存筛选"
@@ -1130,7 +1130,7 @@ const Material = ({ user }) => {
           )}
         {isMobile ? renderMobileCards() : renderDesktopTable()}
         <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px' }}>
-          共 {filteredMaterials.length} 个材料
+          共 {(filteredMaterials || []).length} 个材料
         </div>
       </Card>
       
