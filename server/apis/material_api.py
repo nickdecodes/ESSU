@@ -83,32 +83,17 @@ def add_material():
 @material_bp.route('/materials')
 def get_materials():
     try:
-        page = request.args.get('page', 1, type=int)
-        page_size = request.args.get('page_size', Config.DEFAULT_PAGE_SIZE, type=int)
-        
-        page_size = min(page_size, Config.MAX_PAGE_SIZE)
-        offset = (page - 1) * page_size
-        
-        result = material_service.get_materials_paginated(offset, page_size)
+        result = material_service.get_all_materials()
         if not result['success']:
-            return jsonify(result)
-        
-        count_result = material_service.get_materials_count()
-        total = count_result['count'] if count_result['success'] else 0
+            return jsonify({'success': False, 'message': result.get('message', '获取材料列表失败'), 'materials': []})
         
         return jsonify({
             'success': True,
-            'data': result['materials'],
-            'total': total,
-            'page': page,
-            'page_size': page_size,
-            'total_pages': (total + page_size - 1) // page_size
+            'materials': result.get('materials', [])
         })
-    except ValueError as e:
-        logger.warning(f'获取材料列表参数错误: {str(e)}')
-        abort(400, description='无效的分页参数')
     except Exception as e:
         logger.error(f'获取材料列表失败: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': '获取材料列表失败', 'materials': []})
 
 
 @material_bp.route('/materials/<int:material_id>/check-products', methods=['POST'])

@@ -51,27 +51,18 @@ def add_product():
 
 @product_bp.route('/products')
 def get_products():
-    page = request.args.get('page', 1, type=int)
-    page_size = request.args.get('page_size', Config.DEFAULT_PAGE_SIZE, type=int)
-    
-    page_size = min(page_size, Config.MAX_PAGE_SIZE)
-    offset = (page - 1) * page_size
-    
-    result = product_service.get_products_paginated(offset, page_size)
-    if not result['success']:
-        return jsonify(result)
-    
-    count_result = product_service.get_products_count()
-    total = count_result['count'] if count_result['success'] else 0
-    
-    return jsonify({
-        'success': True,
-        'data': result['products'],
-        'total': total,
-        'page': page,
-        'page_size': page_size,
-        'total_pages': (total + page_size - 1) // page_size
-    })
+    try:
+        result = product_service.get_all_products()
+        if not result['success']:
+            return jsonify({'success': False, 'message': result.get('message', '获取产品列表失败'), 'products': []})
+        
+        return jsonify({
+            'success': True,
+            'products': result.get('products', [])
+        })
+    except Exception as e:
+        logger.error(f'获取产品列表失败: {str(e)}', exc_info=True)
+        return jsonify({'success': False, 'message': '获取产品列表失败', 'products': []})
 
 
 @product_bp.route('/products/<int:product_id>', methods=['PUT'])

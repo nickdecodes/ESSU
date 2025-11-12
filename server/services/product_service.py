@@ -206,26 +206,6 @@ class ProductService:
             total_count = sum(product.stock_count or 0 for product in products)
             return {'success': True, 'count': total_count}
     
-    def calculate_possible_stock(self, product_id: int) -> dict:
-        """计算产品可制作库存"""
-        with self.db.session_scope() as session:
-            product = session.query(Product).filter(Product.id == product_id).first()
-            if not product:
-                return {'success': False, 'message': '产品不存在'}
-            
-            materials = json.loads(product.materials)
-            possible_stock = float('inf')
-            
-            for material_id, required_qty in materials.items():
-                material = session.query(Material).filter(Material.id == int(material_id)).first()
-                stock_count = material.stock_count if material else 0
-                if required_qty > 0:
-                    possible_stock = min(possible_stock, stock_count // required_qty)
-                else:
-                    possible_stock = 0
-            
-            return {'success': True, 'possible_stock': int(possible_stock) if possible_stock != float('inf') else 0}
-
     def delete_product(self, product_id: int) -> dict:
         """删除产品"""
         try:
