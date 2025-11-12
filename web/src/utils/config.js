@@ -30,7 +30,7 @@ export const Config = {
   VALID_ROLES: ['admin', 'user'],
   
   // API配置
-  API_BASE_URL: 'http://localhost:5274',
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5274',
   
   // 会话检查配置
   SESSION_CHECK_INTERVAL: 30 * 60 * 1000, // 30分钟（毫秒）

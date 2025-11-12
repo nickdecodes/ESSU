@@ -203,8 +203,13 @@ def material_out():
     data = request.json
     material_id = data.get('material_id') or data.get('product_id')
     quantity = data.get('quantity')
-    customer = data.get('customer', '')
+    customer = data.get('customer', '').strip()
     username = data.get('username', '')
+    
+    if not quantity or quantity < Config.MIN_QUANTITY or quantity > Config.MAX_QUANTITY:
+        return jsonify({'success': False, 'message': f'数量必须在{Config.MIN_QUANTITY}-{Config.MAX_QUANTITY}之间'})
+    if customer and len(customer) > Config.MAX_CUSTOMER_LENGTH:
+        return jsonify({'success': False, 'message': f'客户名称不能超过{Config.MAX_CUSTOMER_LENGTH}个字符'})
     
     result = material_service.outbound(int(material_id), quantity, customer)
     

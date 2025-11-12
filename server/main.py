@@ -10,11 +10,19 @@
 @Software: vscode
 """
 
+import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from dotenv import load_dotenv
 from config import Config
+
+# 加载环境变量
+env_file = '.env.development' if os.path.exists('.env.development') else '.env'
+if os.path.exists(env_file):
+    load_dotenv(env_file)
+    print(f'已加载环境变量文件: {env_file}')
 from apis.material_api import material_bp
 from apis.product_api import product_bp
 from apis.record_api import record_bp

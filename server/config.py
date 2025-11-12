@@ -29,7 +29,7 @@ class Config:
     LOG_FILE = 'logs/essu.log'
     LOG_BACKUP_COUNT = 7
     # 日志级别：DEBUG(开发) | INFO(测试) | WARNING(生产)
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')  # 默认INFO，可通过环境变量覆盖
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')  # 默认INFO，可通过环境变量覆盖
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     # 导出配置
@@ -51,9 +51,9 @@ class Config:
     MAX_QUANTITY = 999999
     
     # Flask配置
-    DEBUG = True
-    HOST = '0.0.0.0'
-    PORT = 5274
+    DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+    HOST = os.getenv('HOST', '0.0.0.0')
+    PORT = int(os.getenv('PORT', 5274))
     
     # 用户角色
     ADMIN_ROLE = 'admin'
