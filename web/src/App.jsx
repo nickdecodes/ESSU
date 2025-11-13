@@ -14,6 +14,7 @@ import Product from './pages/Product';
 import User from './pages/User';
 import Records from './pages/Records';
 import Statistics from './pages/Statistics';
+import Monitor from './pages/Monitor';
 import { useAuth } from './utils/hooks';
 import { api } from './utils/api';
 
@@ -66,10 +67,12 @@ function AppContent() {
           return <Material user={user} />;
         case 'product':
           return <Product user={user} />;
-        case 'records':
-          return user.role === 'admin' ? <Records /> : null;
         case 'statistics':
           return <Statistics />;
+        case 'monitor':
+          return user.role === 'admin' ? <Monitor /> : null;
+        case 'records':
+          return user.role === 'admin' ? <Records /> : null;
         case 'user':
           return user.role === 'admin' ? <User user={user} /> : null;
         default:

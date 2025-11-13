@@ -8,6 +8,7 @@ const Dashboard = ({ user }) => {
   const navigate = useNavigate();
   const menuItems = menuConfig(user?.role).filter(item => item.key !== 'home');
   const colorMap = {
+    monitor: '#667eea',
     material: '#a8e6cf',
     product: '#ffd93d',
     statistics: '#74b9ff',
@@ -21,8 +22,8 @@ const Dashboard = ({ user }) => {
         style={{
           borderRadius: '20px',
           border: 'none',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+          background: `linear-gradient(135deg, ${colorMap.monitor} 0%, #764ba2 100%)`,
           color: 'white'
         }}
         styles={{ body: { padding: isMobile ? '20px' : '40px' } }}

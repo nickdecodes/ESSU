@@ -62,10 +62,23 @@ def serve_image(filename):
 
 @common_bp.route('/health')
 def health_check():
-    """健康检查接口"""
+    """健康检查接口（简化版，用于负载均衡器）"""
+    import psutil
+    
+    # 简单的健康检查
+    cpu_percent = psutil.cpu_percent(interval=0.1)
+    memory_percent = psutil.virtual_memory().percent
+    
+    # 判断健康状态
+    is_healthy = cpu_percent < 95 and memory_percent < 95
+    
     return jsonify({
-        'status': 'healthy',
+        'status': 'healthy' if is_healthy else 'unhealthy',
         'timestamp': datetime.now().isoformat(),
         'version': '1.0.0',
-        'service': 'ESSU'
-    })
+        'service': 'ESSU',
+        'metrics': {
+            'cpu_percent': round(cpu_percent, 2),
+            'memory_percent': round(memory_percent, 2)
+        }
+    }), 200 if is_healthy else 503

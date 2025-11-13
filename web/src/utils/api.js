@@ -179,5 +179,14 @@ export const api = {
     
     exportFile('/records/export', queryParams);
   },
-  deleteRecords: (data) => request.delete('/records', data)
+  deleteRecords: (data) => request.delete('/records', data),
+
+  // 系统监控相关
+  getSystemDashboard: () => request.get('/system/dashboard'),
+  getSystemCPU: () => request.get('/system/cpu'),
+  getSystemMemory: () => request.get('/system/memory'),
+  getSystemDisk: () => request.get('/system/disk'),
+  getSystemNetwork: () => request.get('/system/network'),
+  getSystemProcess: () => request.get('/system/process'),
+  getSystemInfo: () => request.get('/system/info')
 };

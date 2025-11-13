@@ -10,7 +10,7 @@ export const useResponsive = () => {
       timeoutId = setTimeout(() => {
         const newIsMobile = window.innerWidth <= 768;
         setIsMobile(newIsMobile);
-      }, 100);
+      }, 50); // 减少延迟从 100ms 到 50ms
     };
     
     window.addEventListener('resize', handleResize);

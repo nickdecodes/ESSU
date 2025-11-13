@@ -152,7 +152,7 @@ export default function MainLayout({ user, onLogout, children, currentTab, onTab
         html, body { overscroll-behavior: none; }
         .ant-layout-content { padding: 0 !important; }
       `}</style>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout key={isMobile ? 'mobile' : 'desktop'} style={{ minHeight: '100vh' }}>
         <Header style={{ 
           padding: isMobile ? '0 12px' : '0 24px',
           background: darkMode ? 'rgba(0, 21, 41, 0.8)' : 'rgba(255, 255, 255, 0.8)',
