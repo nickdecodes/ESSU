@@ -188,5 +188,12 @@ export const api = {
   getSystemDisk: () => request.get('/system/disk'),
   getSystemNetwork: () => request.get('/system/network'),
   getSystemProcess: () => request.get('/system/process'),
-  getSystemInfo: () => request.get('/system/info')
+  getSystemInfo: () => request.get('/system/info'),
+
+  // 统计分析相关
+  getStatisticsSummary: (days = 30) => request.get('/statistics/summary', { days }),
+  getMaterialTrend: (materialId, days = 30) => request.get('/statistics/material-trend', { material_id: materialId, days }),
+  getProductTrend: (productId, days = 30) => request.get('/statistics/product-trend', { product_id: productId, days }),
+  getTopMaterials: (limit = 10, days = 30) => request.get('/statistics/top-materials', { limit, days }),
+  getTopProducts: (limit = 10, days = 30) => request.get('/statistics/top-products', { limit, days })
 };
