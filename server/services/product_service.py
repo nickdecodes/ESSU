@@ -20,7 +20,7 @@ from datetime import datetime
 from PIL import Image
 from openpyxl.drawing.image import Image as XLImage
 from dbs.db_manager import DBManager
-from dbs.models import Product, Material
+from dbs.models import Product, Material, ProductHistory
 from services.material_service import MaterialService
 from utils.timezone_utils import format_china_time
 from config import Config
@@ -330,7 +330,25 @@ class ProductService:
                 for material_id_str, required_qty in materials.items():
                     materials_map[int(material_id_str)].stock_count -= required_qty * quantity
                 
-                product.stock_count = (product.stock_count or 0) + quantity
+                stock_before = product.stock_count or 0
+                product.stock_count = stock_before + quantity
+                stock_after = product.stock_count
+                
+                # 记录历史
+                history = ProductHistory(
+                    product_id=product.id,
+                    product_name=product.name,
+                    operation_type='inbound',
+                    quantity=quantity,
+                    in_price=product.in_price,
+                    out_price=product.out_price,
+                    other_price=product.other_price,
+                    final_price=product.in_price,
+                    stock_before=stock_before,
+                    stock_after=stock_after
+                )
+                session.add(history)
+                
                 self.logger.info(f'产品入库成功: {product_id}, 数量: {quantity}')
                 return {'success': True, 'product_name': product.name}
         except Exception as e:
@@ -349,7 +367,25 @@ class ProductService:
                 if stock_count < quantity:
                     return {'success': False, 'message': f'产品库存不足，当前: {stock_count}'}
                 
+                stock_before = stock_count
                 product.stock_count = stock_count - quantity
+                stock_after = product.stock_count
+                
+                # 记录历史
+                history = ProductHistory(
+                    product_id=product.id,
+                    product_name=product.name,
+                    operation_type='outbound',
+                    quantity=-quantity,
+                    in_price=product.in_price,
+                    out_price=product.out_price,
+                    other_price=product.other_price,
+                    final_price=product.out_price,
+                    stock_before=stock_before,
+                    stock_after=stock_after
+                )
+                session.add(history)
+                
                 self.logger.info(f'产品出库成功: {product_id}, 数量: {quantity}')
                 return {'success': True, 'product_name': product.name}
         except Exception as e:
@@ -374,7 +410,25 @@ class ProductService:
                     if material:
                         material.stock_count += required_qty * quantity
                 
-                product.stock_count = (product.stock_count or 0) - quantity
+                stock_before = product.stock_count or 0
+                product.stock_count = stock_before - quantity
+                stock_after = product.stock_count
+                
+                # 记录历史
+                history = ProductHistory(
+                    product_id=product.id,
+                    product_name=product.name,
+                    operation_type='restore',
+                    quantity=-quantity,
+                    in_price=product.in_price,
+                    out_price=product.out_price,
+                    other_price=product.other_price,
+                    final_price=0,
+                    stock_before=stock_before,
+                    stock_after=stock_after
+                )
+                session.add(history)
+                
                 self.logger.info(f'产品还原成功: {product_id}, 数量: {quantity}')
                 return {'success': True, 'product_name': product.name}
         except Exception as e:

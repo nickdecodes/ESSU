@@ -317,12 +317,30 @@ class MaterialService:
     def inbound(self, material_id: int, quantity: int, supplier: str) -> dict:
         """入库材料"""
         try:
+            from dbs.models import MaterialHistory
             with self.db.session_scope() as session:
                 material = session.query(Material).filter(Material.id == material_id).first()
                 if not material:
                     return {'success': False, 'message': '材料不存在'}
                 
+                stock_before = material.stock_count
                 material.stock_count += quantity
+                stock_after = material.stock_count
+                
+                # 记录历史
+                history = MaterialHistory(
+                    material_id=material.id,
+                    material_name=material.name,
+                    operation_type='inbound',
+                    quantity=quantity,
+                    in_price=material.in_price,
+                    out_price=material.out_price,
+                    final_price=material.in_price,
+                    stock_before=stock_before,
+                    stock_after=stock_after
+                )
+                session.add(history)
+                
                 self.logger.info(f'材料入库成功: {material_id}, 数量: {quantity}')
                 return {'success': True, 'material_name': material.name}
         except Exception as e:
@@ -332,6 +350,7 @@ class MaterialService:
     def outbound(self, material_id: int, quantity: int, customer: str) -> dict:
         """出库操作"""
         try:
+            from dbs.models import MaterialHistory
             with self.db.session_scope() as session:
                 material = session.query(Material).filter(Material.id == material_id).first()
                 if not material:
@@ -340,7 +359,24 @@ class MaterialService:
                 if material.stock_count < quantity:
                     return {'success': False, 'message': f'库存不足，当前库存: {material.stock_count}'}
                 
+                stock_before = material.stock_count
                 material.stock_count -= quantity
+                stock_after = material.stock_count
+                
+                # 记录历史
+                history = MaterialHistory(
+                    material_id=material.id,
+                    material_name=material.name,
+                    operation_type='outbound',
+                    quantity=-quantity,
+                    in_price=material.in_price,
+                    out_price=material.out_price,
+                    final_price=material.out_price,
+                    stock_before=stock_before,
+                    stock_after=stock_after
+                )
+                session.add(history)
+                
                 self.logger.info(f'材料出库成功: {material_id}, 数量: {quantity}')
                 return {'success': True, 'material_name': material.name}
         except Exception as e:

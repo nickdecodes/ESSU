@@ -31,6 +31,7 @@ from apis.record_api import record_bp
 from apis.user_api import user_bp
 from apis.common_api import common_bp
 from apis.system_api import system_bp
+from apis.statistics_api import statistics_bp
 
 
 # ============ 初始化Flask应用 ============
@@ -79,7 +80,7 @@ setup_logging()
 
 
 # ============ 注册蓝图 ============
-for bp in (material_bp, user_bp, product_bp, record_bp, common_bp, system_bp):
+for bp in (material_bp, user_bp, product_bp, record_bp, common_bp, system_bp, statistics_bp):
     app.register_blueprint(bp)
 
 app.logger.info('ESSU服务启动')

@@ -123,3 +123,74 @@ class OperationRecord(Base):
     detail = Column(String(500))
     username = Column(String(50), index=True)
     created_at = Column(DateTime, default=china_now, index=True)
+
+
+class MaterialHistory(Base):
+    """
+    材料库存历史记录 - 用于数据分析和趋势统计
+    
+    Attributes:
+        id: 记录ID
+        material_id: 材料ID
+        material_name: 材料名称
+        operation_type: 操作类型 (inbound/outbound)
+        quantity: 变动数量 (正数入库，负数出库)
+        in_price: 进价
+        out_price: 售价
+        final_price: 实际交易价格
+        stock_before: 变动前库存
+        stock_after: 变动后库存
+        created_at: 创建时间
+    """
+    __tablename__ = 'material_history'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    material_id = Column(Integer, nullable=False, index=True)
+    material_name = Column(String(100), nullable=False)
+    operation_type = Column(String(20), nullable=False, index=True)
+    quantity = Column(Integer, nullable=False)
+    in_price = Column(Float, default=0)
+    out_price = Column(Float, default=0)
+    final_price = Column(Float, default=0)
+    stock_before = Column(Integer, nullable=False)
+    stock_after = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=china_now, index=True)
+
+
+class ProductHistory(Base):
+    """
+    产品库存历史记录 - 用于数据分析和趋势统计
+    
+    Attributes:
+        id: 记录ID
+        product_id: 产品ID
+        product_name: 产品名称
+        operation_type: 操作类型 (inbound/outbound/restore)
+        quantity: 变动数量 (正数入库，负数出库)
+        in_price: 成本价
+        out_price: 售价
+        other_price: 其他费用
+        final_price: 实际交易价格
+        stock_before: 变动前库存
+        stock_after: 变动后库存
+        created_at: 创建时间
+    """
+    __tablename__ = 'product_history'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, nullable=False, index=True)
+    product_name = Column(String(100), nullable=False)
+    operation_type = Column(String(20), nullable=False, index=True)
+    quantity = Column(Integer, nullable=False)
+    in_price = Column(Float, default=0)
+    out_price = Column(Float, default=0)
+    other_price = Column(Float, default=0)
+    final_price = Column(Float, default=0)
+    stock_before = Column(Integer, nullable=False)
+    stock_after = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=china_now, index=True)
+
+
+# 复合索引用于查询优化
+Index('idx_material_history', MaterialHistory.material_id, MaterialHistory.created_at)
+Index('idx_product_history', ProductHistory.product_id, ProductHistory.created_at)
