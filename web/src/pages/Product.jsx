@@ -899,7 +899,7 @@ const Product = ({ user }) => {
           showExpandColumn: false,
         }}
       />
-      <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px', color: '#666' }}>
+      <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px' }}>
         共 {filteredProducts.length} 个产品
       </div>
       
@@ -1621,9 +1621,6 @@ const Product = ({ user }) => {
             </Space>
           )}
         {isMobile ? renderMobileCards() : renderDesktopTable()}
-        <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px' }}>
-          共 {filteredProducts.length} 个产品
-        </div>
       </Card>
 
       <Modal

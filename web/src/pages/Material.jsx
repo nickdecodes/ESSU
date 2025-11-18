@@ -535,7 +535,7 @@ const Material = ({ user }) => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
         }}
       />
-      <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px', color: '#666' }}>
+      <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px' }}>
         共 {getFilteredMaterials().length} 个材料
       </div>
     </>
@@ -1129,9 +1129,6 @@ const Material = ({ user }) => {
             </Space>
           )}
         {isMobile ? renderMobileCards() : renderDesktopTable()}
-        <div style={{ textAlign: 'center', padding: '8px 0', fontSize: '12px' }}>
-          共 {(filteredMaterials || []).length} 个材料
-        </div>
       </Card>
       
       <Modal
